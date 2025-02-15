@@ -7,5 +7,6 @@
    
 ## Используемый стек:
 Backend: Java, Spring Boot, Spring Data, Spring Security.
+Frontend: Spring Thymeleaf.
 База данных: PostgreSQL.
 Взаимодействие между backend и frontend осуществляется посредством JSON, REST.

@@ -3,7 +3,7 @@ package com.example.beauty_salon_booking.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "master")
+@Table(name = "masters")
 public class Master {
 
     @Id

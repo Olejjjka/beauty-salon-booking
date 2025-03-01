@@ -28,6 +28,8 @@ public class MasterService {
         return masterRepository.findById(id);
     }
 
+    public Optional<Master> getMasterByName(String name) { return masterRepository.findByName(name); }
+
     public Optional<Master> getMasterByPhone(String phone) {
         return masterRepository.findByPhone(phone);
     }
@@ -56,8 +58,6 @@ public class MasterService {
             return masterRepository.save(existingMaster);
         });
     }
-
-    // PATCH method: Update only provided fields
     public Optional<Master> updateMaster(Long id, Map<String, Object> updates) {
         return masterRepository.findById(id).map(existingMaster -> {
             if (updates.containsKey("name")) {

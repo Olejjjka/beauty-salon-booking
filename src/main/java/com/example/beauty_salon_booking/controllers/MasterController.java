@@ -38,6 +38,13 @@ public class MasterController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/by-name/{name}")
+    public ResponseEntity<Master> getMasterByName(@PathVariable String name) {
+        return masterService.getMasterByName(name)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/by-phone/{phone}")
     public ResponseEntity<Master> getMasterByPhone(@PathVariable String phone) {
         return masterService.getMasterByPhone(phone)

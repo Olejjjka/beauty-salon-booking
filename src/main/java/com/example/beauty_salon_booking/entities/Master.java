@@ -10,12 +10,18 @@ public class Master {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
     private String phone;
+
+    @Column(nullable = false, unique = true)
     private String login;
+
+    @Column(nullable = false)
     private String password;
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

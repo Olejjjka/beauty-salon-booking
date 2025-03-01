@@ -1,6 +1,10 @@
 package com.example.beauty_salon_booking.entities;
 
+import com.example.beauty_salon_booking.enums.AppointmentStatus;
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "appointments")
@@ -11,22 +15,27 @@ public class Appointment {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "master_id")
+    @JoinColumn(name = "master_id", nullable = false)
     private Master master;
 
     @ManyToOne
-    @JoinColumn(name = "service_id")
-    private Service service;
+    @JoinColumn(name = "beauty_service_id", nullable = false)
+    private BeautyService beautyService;
 
-    private String date;
-    private String time;
-    private String status;
+    @Column(nullable = false)
+    private LocalDate date;
 
-    // Getters and setters
+    @Column(nullable = false)
+    private LocalTime time;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AppointmentStatus status;
+
     public Long getId() {
         return id;
     }
@@ -51,35 +60,33 @@ public class Appointment {
         this.master = master;
     }
 
-    public Service getService() {
-        return service;
+    public BeautyService getBeautyService() {
+        return beautyService;
     }
 
-    public void setService(Service service) {
-        this.service = service;
+    public void setBeautyService(BeautyService beautyService) {
+        this.beautyService = beautyService;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
+    public void setDate(LocalDate date) { this.date = date; }
 
-    public String getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
-    public String getStatus() {
+    public AppointmentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(AppointmentStatus status) {
         this.status = status;
     }
 }

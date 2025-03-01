@@ -3,17 +3,19 @@ package com.example.beauty_salon_booking.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "services")
-public class Service {
+@Table(name = "beauty_services")
+public class BeautyService {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "beauty_service_name", nullable = false, unique = true)
     private String name;
+
+    @Column(nullable = false)
     private Double price;
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

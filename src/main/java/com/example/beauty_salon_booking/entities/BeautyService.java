@@ -18,7 +18,7 @@ public class BeautyService {
     @Column(nullable = false)
     private Double price;
 
-    @ManyToMany(mappedBy = "beautyServices")
+    @ManyToMany(mappedBy = "beautyServices", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Master> masters;
 
     public Long getId() {
@@ -51,5 +51,19 @@ public class BeautyService {
 
     public void setMasters(List<Master> masters) {
         this.masters = masters;
+    }
+
+    public void addMaster(Master master) {
+        if (!masters.contains(master)) {
+            masters.add(master);
+            master.getBeautyServices().add(this);
+        }
+    }
+
+    public void removeMaster(Master master) {
+        if (masters.contains(master)) {
+            masters.remove(master);
+            master.getBeautyServices().remove(this);
+        }
     }
 }

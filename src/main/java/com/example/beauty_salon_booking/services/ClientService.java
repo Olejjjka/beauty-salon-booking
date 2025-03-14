@@ -5,6 +5,7 @@ import com.example.beauty_salon_booking.repositories.ClientRepository;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,18 +38,19 @@ public class ClientService {
         return clientRepository.findByLogin(login);
     }
 
-    ///////////////////
+    @Transactional
     public Client saveClient(Client client) {
 
         client.setPassword(passwordEncoder.encode(client.getPassword()));
         return clientRepository.save(client);
     }
-    //////////////////
 
+    @Transactional
     public void deleteClient(Long id) {
         clientRepository.deleteById(id);
     }
 
+    @Transactional
     public Optional<Client> replaceClient(Long id, Client newClient) {
         return clientRepository.findById(id).map(existingClient -> {
             existingClient.setName(newClient.getName());
@@ -59,6 +61,7 @@ public class ClientService {
         });
     }
 
+    @Transactional
     public Optional<Client> updateClient(Long id, Map<String, Object> updates) {
         return clientRepository.findById(id).map(existingClient -> {
             if (updates.containsKey("name")) {
@@ -71,7 +74,7 @@ public class ClientService {
                 existingClient.setLogin((String) updates.get("login"));
             }
             if (updates.containsKey("password")) {
-                existingClient.setPassword((String) updates.get("password"));
+                existingClient.setPassword(passwordEncoder.encode((String) updates.get("password")));
             }
             return clientRepository.save(existingClient);
         });

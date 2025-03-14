@@ -7,6 +7,7 @@ import com.example.beauty_salon_booking.repositories.ClientRepository;
 import com.example.beauty_salon_booking.repositories.MasterRepository;
 import com.example.beauty_salon_booking.repositories.BeautyServiceRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -61,14 +62,17 @@ public class AppointmentService {
         return appointmentRepository.findByStatus(status);
     }
 
+    @Transactional
     public Appointment saveAppointment(Appointment appointment) {
         return appointmentRepository.save(appointment);
     }
 
+    @Transactional
     public void deleteAppointment(Long id) {
         appointmentRepository.deleteById(id);
     }
 
+    @Transactional
     public Optional<Appointment> replaceAppointment(Long id, Appointment newAppointment) {
         return appointmentRepository.findById(id).map(existingAppointment -> {
             existingAppointment.setClient(newAppointment.getClient());
@@ -81,6 +85,7 @@ public class AppointmentService {
         });
     }
 
+    @Transactional
     public Optional<Appointment> updateAppointment(Long id, Map<String, Object> updates) {
         return appointmentRepository.findById(id).map(existingAppointment -> {
             if (updates.containsKey("clientId")) {

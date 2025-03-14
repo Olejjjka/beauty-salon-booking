@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.List;
 
 import com.example.beauty_salon_booking.entities.Client;
 import com.example.beauty_salon_booking.services.ClientService;
@@ -22,9 +23,13 @@ public class ClientController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Client> registerClient(@RequestBody Client client) {
-        Client savedClient = clientService.saveClient(client);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedClient);
+    public ResponseEntity<Client> createClient(@RequestBody Client client) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(clientService.saveClient(client));
+    }
+
+    @GetMapping
+    public List<Client> getAllClients() {
+        return clientService.getAllClients();
     }
 
     @GetMapping("/{id}")
@@ -68,4 +73,3 @@ public class ClientController {
         return ResponseEntity.noContent().build();
     }
 }
-

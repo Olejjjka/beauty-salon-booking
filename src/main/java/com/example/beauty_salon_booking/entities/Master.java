@@ -24,7 +24,7 @@ public class Master {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "master_beauty_services",
             joinColumns = @JoinColumn(name = "master_id"),
@@ -78,5 +78,19 @@ public class Master {
 
     public void setBeautyServices(List<BeautyService> beautyServices) {
         this.beautyServices = beautyServices;
+    }
+
+    public void addBeautyService(BeautyService beautyService) {
+        if (!beautyServices.contains(beautyService)) {
+            beautyServices.add(beautyService);
+            beautyService.getMasters().add(this);
+        }
+    }
+
+    public void removeBeautyService(BeautyService beautyService) {
+        if (beautyServices.contains(beautyService)) {
+            beautyServices.remove(beautyService);
+            beautyService.getMasters().remove(this);
+        }
     }
 }

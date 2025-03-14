@@ -2,6 +2,8 @@ package com.example.beauty_salon_booking.entities;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "beauty_services")
 public class BeautyService {
@@ -15,6 +17,9 @@ public class BeautyService {
 
     @Column(nullable = false)
     private Double price;
+
+    @ManyToMany(mappedBy = "beautyServices")
+    private List<Master> masters;
 
     public Long getId() {
         return id;
@@ -38,5 +43,13 @@ public class BeautyService {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public List<Master> getMasters() {
+        return masters;
+    }
+
+    public void setMasters(List<Master> masters) {
+        this.masters = masters;
     }
 }

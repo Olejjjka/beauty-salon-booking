@@ -1,11 +1,13 @@
 package com.example.beauty_salon_booking.services;
 
 import com.example.beauty_salon_booking.entities.Master;
+import com.example.beauty_salon_booking.entities.BeautyService;
 import com.example.beauty_salon_booking.repositories.MasterRepository;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
@@ -74,5 +76,25 @@ public class MasterService {
             }
             return masterRepository.save(existingMaster);
         });
+    }
+
+    public List<BeautyService> getBeautyServicesByMasterId(Long masterId) {
+        return masterRepository.findById(masterId)
+                .map(Master::getBeautyServices)
+                .orElse(Collections.emptyList());
+    }
+
+    public Master addBeautyServiceToMaster(Long masterId, BeautyService service) {
+        return masterRepository.findById(masterId).map(master -> {
+            master.getBeautyServices().add(service);
+            return masterRepository.save(master);
+        }).orElseThrow(() -> new RuntimeException("Master not found"));
+    }
+
+    public Master removeBeautyServiceFromMaster(Long masterId, BeautyService service) {
+        return masterRepository.findById(masterId).map(master -> {
+            master.getBeautyServices().remove(service);
+            return masterRepository.save(master);
+        }).orElseThrow(() -> new RuntimeException("Master not found"));
     }
 }

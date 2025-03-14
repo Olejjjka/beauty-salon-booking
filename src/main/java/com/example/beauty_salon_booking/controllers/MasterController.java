@@ -48,7 +48,6 @@ public class MasterController {
         return ResponseEntity.ok(master);
     }
 
-
     @GetMapping
     public List<Master> getAllMasters() {
         return masterService.getAllMasters();

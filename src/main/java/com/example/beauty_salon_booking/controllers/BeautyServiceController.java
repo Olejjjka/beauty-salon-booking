@@ -26,13 +26,13 @@ public class BeautyServiceController {
     }
 
     @PostMapping
-    public ResponseEntity<BeautyService> createService(@RequestBody BeautyService service) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(beautyServiceService.saveBeautyService(service));
+    public ResponseEntity<BeautyService> createBeautyService(@RequestBody BeautyService beautyService) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(beautyServiceService.saveBeautyService(beautyService));
     }
 
     @PostMapping("/{serviceId}/masters/{masterId}")
-    public ResponseEntity<BeautyService> addMasterToBeautyService(@PathVariable Long serviceId, @PathVariable Long masterId) {
-        BeautyService beautyService = beautyServiceService.getBeautyServiceById(serviceId)
+    public ResponseEntity<BeautyService> addMasterToBeautyService(@PathVariable Long beautyServiceId, @PathVariable Long masterId) {
+        BeautyService beautyService = beautyServiceService.getBeautyServiceById(beautyServiceId)
                 .orElseThrow(() -> new RuntimeException("Beauty Service not found"));
 
         Master master = masterService.getMasterById(masterId)
@@ -51,48 +51,47 @@ public class BeautyServiceController {
     public List<BeautyService> getAllBeautyServices() { return beautyServiceService.getAllBeautyServices(); }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BeautyService> getServiceById(@PathVariable Long id) {
+    public ResponseEntity<BeautyService> getBeautyServiceById(@PathVariable Long id) {
         return beautyServiceService.getBeautyServiceById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-name/{name}")
-    public ResponseEntity<BeautyService> getServiceByName(@PathVariable String name) {
+    public ResponseEntity<BeautyService> getBeautyServiceByName(@PathVariable String name) {
         return beautyServiceService.getBeautyServiceByName(name)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/price-range")
-    public ResponseEntity<List<BeautyService>> getServicesByPriceRange(
-            @RequestParam double minPrice, @RequestParam double maxPrice) {
+    public ResponseEntity<List<BeautyService>> getBeautyServiceByPriceRange(@RequestParam double minPrice, @RequestParam double maxPrice) {
         return ResponseEntity.ok(beautyServiceService.getBeautyServicesByPriceRange(minPrice, maxPrice));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BeautyService> replaceService(@PathVariable Long id, @RequestBody BeautyService newService) {
-        return beautyServiceService.replaceService(id, newService)
+    public ResponseEntity<BeautyService> replaceBeautyService(@PathVariable Long id, @RequestBody BeautyService newBeautyService) {
+        return beautyServiceService.replaceService(id, newBeautyService)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<BeautyService> updateService(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<BeautyService> updateBeautyService(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return beautyServiceService.updateService(id, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteService(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteBeautyService(@PathVariable Long id) {
         beautyServiceService.deleteBeautyService(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{serviceId}/masters/{masterId}")
-    public ResponseEntity<Void> removeMasterFromBeautyService(@PathVariable Long serviceId, @PathVariable Long masterId) {
-        BeautyService beautyService = beautyServiceService.getBeautyServiceById(serviceId)
+    public ResponseEntity<Void> removeMasterFromBeautyService(@PathVariable Long beautyServiceId, @PathVariable Long masterId) {
+        BeautyService beautyService = beautyServiceService.getBeautyServiceById(beautyServiceId)
                 .orElseThrow(() -> new RuntimeException("Beauty Service not found"));
 
         Master master = masterService.getMasterById(masterId)

@@ -2,6 +2,8 @@ package com.example.beauty_salon_booking.entities;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "masters")
 public class Master {
@@ -21,6 +23,14 @@ public class Master {
 
     @Column(nullable = false)
     private String password;
+
+    @ManyToMany
+    @JoinTable(
+            name = "master_beauty_services",
+            joinColumns = @JoinColumn(name = "master_id"),
+            inverseJoinColumns = @JoinColumn(name = "beauty_service_id")
+    )
+    private List<BeautyService> beautyServices;
 
     public Long getId() {
         return id;
@@ -60,5 +70,13 @@ public class Master {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<BeautyService> getBeautyServices() {
+        return beautyServices;
+    }
+
+    public void setBeautyServices(List<BeautyService> beautyServices) {
+        this.beautyServices = beautyServices;
     }
 }

@@ -31,12 +31,12 @@ public class MasterController {
         return ResponseEntity.status(HttpStatus.CREATED).body(masterService.saveMaster(master));
     }
 
-    @PostMapping("/{masterId}/services/{serviceId}")
-    public ResponseEntity<Master> addBeautyServiceToMaster(@PathVariable Long masterId, @PathVariable Long serviceId) {
+    @PostMapping("/{masterId}/beauty-services/{beautyServiceId}")
+    public ResponseEntity<Master> addBeautyServiceToMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
         Master master = masterService.getMasterById(masterId)
                 .orElseThrow(() -> new RuntimeException("Master not found"));
 
-        BeautyService beautyService = beautyServiceService.getBeautyServiceById(serviceId)
+        BeautyService beautyService = beautyServiceService.getBeautyServiceById(beautyServiceId)
                 .orElseThrow(() -> new RuntimeException("Beauty Service not found"));
 
         master.getBeautyServices().add(beautyService);

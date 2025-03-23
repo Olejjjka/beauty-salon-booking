@@ -25,12 +25,12 @@ public class BeautyServiceController {
         this.masterService = masterService;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<BeautyService> createBeautyService(@RequestBody BeautyService beautyService) {
         return ResponseEntity.status(HttpStatus.CREATED).body(beautyServiceService.saveBeautyService(beautyService));
     }
 
-    @PostMapping("/{serviceId}/masters/{masterId}")
+    @PostMapping("/{beautyServiceId}/masters/{masterId}")
     public ResponseEntity<BeautyService> addMasterToBeautyService(@PathVariable Long beautyServiceId, @PathVariable Long masterId) {
         BeautyService beautyService = beautyServiceService.getBeautyServiceById(beautyServiceId)
                 .orElseThrow(() -> new RuntimeException("Beauty Service not found"));

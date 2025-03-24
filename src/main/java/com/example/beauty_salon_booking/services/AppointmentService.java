@@ -50,8 +50,8 @@ public class AppointmentService {
         return appointmentRepository.findByMasterId(masterId);
     }
 
-    public List<Appointment> getAppointmentsByBeautyServiceId(Long serviceId) {
-        return appointmentRepository.findByBeautyServiceId(serviceId);
+    public List<Appointment> getAppointmentsByBeautyServiceId(Long beautyServiceId) {
+        return appointmentRepository.findByBeautyServiceId(beautyServiceId);
     }
 
     public List<Appointment> getAppointmentsByDateAndTime(LocalDate date, LocalTime time) {
@@ -61,6 +61,23 @@ public class AppointmentService {
     public List<Appointment> getAppointmentsByStatus(AppointmentStatus status) {
         return appointmentRepository.findByStatus(status);
     }
+   ////
+    @Transactional
+    public Appointment createAppointment(Long clientId, Long masterId, Long beautyServiceId,
+                                         LocalDate date, LocalTime time, AppointmentStatus status) {
+        Appointment appointment = new Appointment();
+        appointment.setClient(clientRepository.findById(clientId)
+                .orElseThrow(() -> new IllegalArgumentException("Client not found")));
+        appointment.setMaster(masterRepository.findById(masterId)
+                .orElseThrow(() -> new IllegalArgumentException("Master not found")));
+        appointment.setBeautyService(beautyServiceRepository.findById(beautyServiceId)
+                .orElseThrow(() -> new IllegalArgumentException("Beauty Service not found")));
+        appointment.setDate(date);
+        appointment.setTime(time);
+        appointment.setStatus(status);
+        return appointmentRepository.save(appointment);
+    }
+
 
     @Transactional
     public Appointment saveAppointment(Appointment appointment) {

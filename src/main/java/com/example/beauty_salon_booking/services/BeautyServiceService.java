@@ -71,8 +71,8 @@ public class BeautyServiceService {
         });
     }
 
-    public List<Master> getMastersByBeautyServiceId(Long serviceId) {
-        return beautyServiceRepository.findById(serviceId)
+    public List<Master> getMastersByBeautyServiceId(Long beautyServiceId) {
+        return beautyServiceRepository.findById(beautyServiceId)
                 .map(BeautyService::getMasters)
                 .orElse(Collections.emptyList());
     }

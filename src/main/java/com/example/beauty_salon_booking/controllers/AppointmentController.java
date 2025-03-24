@@ -25,10 +25,24 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
+    //@PostMapping("/create")
+    //public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
+    //    return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.saveAppointment(appointment));
+    //}
+
     @PostMapping("/create")
-    public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.saveAppointment(appointment));
+    public ResponseEntity<Appointment> createAppointment(@RequestBody Map<String, Object> payload) {
+        Long clientId = ((Number) payload.get("clientId")).longValue();
+        Long masterId = ((Number) payload.get("masterId")).longValue();
+        Long beautyServiceId = ((Number) payload.get("beautyServiceId")).longValue();
+        LocalDate date = LocalDate.parse((String) payload.get("date"));
+        LocalTime time = LocalTime.parse((String) payload.get("time"));
+        AppointmentStatus status = AppointmentStatus.valueOf((String) payload.get("status"));
+
+        Appointment appointment = appointmentService.createAppointment(clientId, masterId, beautyServiceId, date, time, status);
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointment);
     }
+
 
     @GetMapping
     public List<Appointment> getAllAppointments() { return appointmentService.getAllAppointments(); }

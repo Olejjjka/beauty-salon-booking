@@ -17,13 +17,11 @@ import com.example.beauty_salon_booking.services.BeautyServiceService;
 @RequestMapping("/masters")
 public class MasterController {
     private final MasterService masterService;
-    private final BeautyServiceService beautyServiceService;
 
     @Autowired
     public MasterController(MasterService masterService, BeautyServiceService beautyServiceService) {
 
         this.masterService = masterService;
-        this.beautyServiceService = beautyServiceService;
     }
 
     @PostMapping("/register")
@@ -33,18 +31,7 @@ public class MasterController {
 
     @PostMapping("/{masterId}/beauty-services/{beautyServiceId}")
     public ResponseEntity<Master> addBeautyServiceToMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
-        Master master = masterService.getMasterById(masterId)
-                .orElseThrow(() -> new RuntimeException("Master not found"));
-
-        BeautyService beautyService = beautyServiceService.getBeautyServiceById(beautyServiceId)
-                .orElseThrow(() -> new RuntimeException("Beauty Service not found"));
-
-        master.getBeautyServices().add(beautyService);
-        beautyService.getMasters().add(master);
-
-        masterService.saveMaster(master);
-        beautyServiceService.saveBeautyService(beautyService);
-
+        Master master = masterService.addBeautyServiceToMaster(masterId, beautyServiceId);
         return ResponseEntity.ok(master);
     }
 
@@ -81,6 +68,11 @@ public class MasterController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{masterId}/beauty-services")
+    public ResponseEntity<List<BeautyService>> getBeautyServicesByMasterId(@PathVariable Long masterId) {
+        return ResponseEntity.ok(masterService.getBeautyServicesByMasterId(masterId));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Master> replaceMaster(@PathVariable Long id, @RequestBody Master newMaster) {
         return masterService.replaceMaster(id, newMaster)
@@ -101,20 +93,9 @@ public class MasterController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{masterId}/services/{serviceId}")
-    public ResponseEntity<Void> removeBeautyServiceFromMaster(@PathVariable Long masterId, @PathVariable Long serviceId) {
-        Master master = masterService.getMasterById(masterId)
-                .orElseThrow(() -> new RuntimeException("Master not found"));
-
-        BeautyService beautyService = beautyServiceService.getBeautyServiceById(serviceId)
-                .orElseThrow(() -> new RuntimeException("Beauty Service not found"));
-
-        master.getBeautyServices().remove(beautyService);
-        beautyService.getMasters().remove(master);
-
-        masterService.saveMaster(master);
-        beautyServiceService.saveBeautyService(beautyService);
-
+    @DeleteMapping("/{masterId}/beauty-services/{beautyServiceId}")
+    public ResponseEntity<Void> removeBeautyServiceFromMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
+        masterService.removeBeautyServiceFromMaster(masterId, beautyServiceId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -19,7 +19,7 @@ public class BeautyServiceController {
     private final BeautyServiceService beautyServiceService;
 
     @Autowired
-    public BeautyServiceController(BeautyServiceService beautyServiceService, MasterService masterService) {
+    public BeautyServiceController(BeautyServiceService beautyServiceService) {
         this.beautyServiceService = beautyServiceService;
     }
 

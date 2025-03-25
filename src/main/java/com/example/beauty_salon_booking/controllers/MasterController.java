@@ -19,7 +19,7 @@ public class MasterController {
     private final MasterService masterService;
 
     @Autowired
-    public MasterController(MasterService masterService, BeautyServiceService beautyServiceService) {
+    public MasterController(MasterService masterService) {
 
         this.masterService = masterService;
     }

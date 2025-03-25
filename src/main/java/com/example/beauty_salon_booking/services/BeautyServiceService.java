@@ -54,6 +54,7 @@ public class BeautyServiceService {
         return beautyServiceRepository.findById(id).map(existingService -> {
             existingService.setName(newService.getName());
             existingService.setPrice(newService.getPrice());
+            existingService.setDescription(newService.getDescription());
             return beautyServiceRepository.save(existingService);
         });
     }
@@ -66,6 +67,9 @@ public class BeautyServiceService {
             }
             if (updates.containsKey("price")) {
                 existingService.setPrice((Double) updates.get("price"));
+            }
+            if (updates.containsKey("description")) {
+                existingService.setDescription((String) updates.get("description"));
             }
             return beautyServiceRepository.save(existingService);
         });

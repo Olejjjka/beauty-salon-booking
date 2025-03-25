@@ -15,6 +15,4 @@ public interface MasterRepository extends JpaRepository<Master, Long> {
     Optional<Master> findByPhone(String phone);
 
     Optional<Master> findByLogin(String login);
-
-    List<BeautyService> findBeautyServicesById(Long id);
 }

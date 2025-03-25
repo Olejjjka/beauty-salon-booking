@@ -21,6 +21,9 @@ public class BeautyService {
     @Column(nullable = false)
     private Double price;
 
+    @Column(nullable = false)
+    private String description;
+
     @ManyToMany(mappedBy = "beautyServices", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Master> masters;
 
@@ -47,6 +50,10 @@ public class BeautyService {
     public void setPrice(Double price) {
         this.price = price;
     }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
 
     public List<Master> getMasters() {
         return masters;

@@ -14,6 +14,4 @@ public interface BeautyServiceRepository extends JpaRepository<BeautyService, Lo
     Optional<BeautyService> findByName(String name);
 
     List<BeautyService> findByPriceBetween(double minPrice, double maxPrice);
-
-    List<Master> findMastersById(Long id);
 }

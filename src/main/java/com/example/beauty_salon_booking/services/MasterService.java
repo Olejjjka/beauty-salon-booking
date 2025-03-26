@@ -1,14 +1,13 @@
 package com.example.beauty_salon_booking.services;
 
 import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
-import com.example.beauty_salon_booking.dto.ClientDTO;
 import com.example.beauty_salon_booking.dto.MasterDTO;
-import com.example.beauty_salon_booking.entities.Client;
 import com.example.beauty_salon_booking.entities.Master;
 import com.example.beauty_salon_booking.entities.BeautyService;
 import com.example.beauty_salon_booking.repositories.MasterRepository;
 import com.example.beauty_salon_booking.repositories.BeautyServiceRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,18 +17,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class MasterService {
     private final MasterRepository masterRepository;
     private final BeautyServiceRepository beautyServiceRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BeautyServiceService beautyServiceService;
 
-    public MasterService(MasterRepository masterRepository, BeautyServiceRepository beautyServiceRepository, PasswordEncoder passwordEncoder) {
+    @Autowired
+    public MasterService(MasterRepository masterRepository, BeautyServiceRepository beautyServiceRepository,
+                         PasswordEncoder passwordEncoder, BeautyServiceService beautyServiceService) {
         this.masterRepository = masterRepository;
         this.beautyServiceRepository = beautyServiceRepository;
         this.passwordEncoder = passwordEncoder;
+        this.beautyServiceService = beautyServiceService;
     }
 
     public List<MasterDTO> getAllMasters() {
@@ -95,10 +97,12 @@ public class MasterService {
         });
     }
 
-    ///
-    public List<BeautyService> getBeautyServicesByMasterId(Long masterId) {
+    public List<BeautyServiceDTO> getBeautyServicesByMasterId(Long masterId) {
         return masterRepository.findById(masterId)
-                .map(Master::getBeautyServices)
+                .map(master -> master.getBeautyServices().stream()
+                        .map(beautyServiceService::convertToDTO)
+                        .toList()
+                )
                 .orElse(Collections.emptyList());
     }
 
@@ -124,7 +128,7 @@ public class MasterService {
         return convertToDTO(masterRepository.save(master));
     }
 
-    private MasterDTO convertToDTO(Master master) {
+    protected MasterDTO convertToDTO(Master master) {
         List<BeautyServiceDTO> beautyServiceDTOs = master.getBeautyServices().stream()
                 .map(beautyService -> new BeautyServiceDTO(
                         beautyService.getId(),
@@ -139,12 +143,5 @@ public class MasterService {
                 master.getName(),
                 master.getPhone(),
                 beautyServiceDTOs);
-    }
-
-    private Client convertToEntity(ClientDTO dto) {
-        Client client = new Client();
-        client.setName(dto.getName());
-        client.setPhone(dto.getPhone());
-        return client;
     }
 }

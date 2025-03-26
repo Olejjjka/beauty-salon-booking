@@ -19,10 +19,13 @@ import java.util.Collections;
 public class BeautyServiceService {
     private final BeautyServiceRepository beautyServiceRepository;
     private final MasterRepository masterRepository;
+    private final MasterService masterService;
 
-    public BeautyServiceService(BeautyServiceRepository beautyServiceRepository, MasterRepository masterRepository) {
+    public BeautyServiceService(BeautyServiceRepository beautyServiceRepository, MasterRepository masterRepository,
+                                MasterService masterService) {
         this.beautyServiceRepository = beautyServiceRepository;
         this.masterRepository = masterRepository;
+        this.masterService = masterService;
     }
 
     public List<BeautyServiceDTO> getAllBeautyServices() {
@@ -81,10 +84,12 @@ public class BeautyServiceService {
         });
     }
 
-    ///
-    public List<Master> getMastersByBeautyServiceId(Long beautyServiceId) {
+    public List<MasterDTO> getMastersByBeautyServiceId(Long beautyServiceId) {
         return beautyServiceRepository.findById(beautyServiceId)
-                .map(BeautyService::getMasters)
+                .map(beautyService -> beautyService.getMasters().stream()
+                        .map(masterService::convertToDTO)
+                        .toList()
+                )
                 .orElse(Collections.emptyList());
     }
 
@@ -110,15 +115,12 @@ public class BeautyServiceService {
         return convertToDTO(beautyServiceRepository.save(beautyService));
     }
 
-    private BeautyServiceDTO convertToDTO(BeautyService beautyService) {
+    protected BeautyServiceDTO convertToDTO(BeautyService beautyService) {
         List<MasterDTO> masterDTOs = beautyService.getMasters().stream()
                 .map(master -> new MasterDTO(
                         master.getId(),
                         master.getName(),
                         master.getPhone()
-                        //master.getBeautyServices().stream() // Используем SimpleMasterDTO
-                         //       .map(m -> new BeautyServiceDTO(m.getId(), m.getName(), m.getPrice(), m.getDescription()))
-                        //        .toList()))
                 ))
                 .toList();
 

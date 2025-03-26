@@ -1,6 +1,7 @@
 package com.example.beauty_salon_booking.controllers;
 
 import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
+import com.example.beauty_salon_booking.dto.MasterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +60,7 @@ public class BeautyServiceController {
 
     ///
     @GetMapping("/{beautyServiceId}/masters")
-    public ResponseEntity<List<Master>> getMastersByBeautyServiceId(@PathVariable Long beautyServiceId) {
+    public ResponseEntity<List<MasterDTO>> getMastersByBeautyServiceId(@PathVariable Long beautyServiceId) {
         return ResponseEntity.ok(beautyServiceService.getMastersByBeautyServiceId(beautyServiceId));
     }
 

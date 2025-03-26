@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
+import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
 import com.example.beauty_salon_booking.dto.MasterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,9 +69,8 @@ public class MasterController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    ////
     @GetMapping("/{masterId}/beauty-services")
-    public ResponseEntity<List<BeautyService>> getBeautyServicesByMasterId(@PathVariable Long masterId) {
+    public ResponseEntity<List<BeautyServiceDTO>> getBeautyServicesByMasterId(@PathVariable Long masterId) {
         return ResponseEntity.ok(masterService.getBeautyServicesByMasterId(masterId));
     }
 

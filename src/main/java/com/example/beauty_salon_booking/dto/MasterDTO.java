@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MasterDTO {
@@ -20,7 +21,7 @@ public class MasterDTO {
         this.id = id;
         this.name = name;
         this.phone = phone;
-        this.beautyServices = null;
+        this.beautyServices = new ArrayList<>();
     }
 
     public Long getId() { return id; }

@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
+import com.example.beauty_salon_booking.dto.ClientDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,45 +24,45 @@ public class ClientController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Client> createClient(@RequestBody Client client) {
+    public ResponseEntity<ClientDTO> createClient(@RequestBody Client client) {
         return ResponseEntity.status(HttpStatus.CREATED).body(clientService.saveClient(client));
     }
 
     @GetMapping
-    public List<Client> getAllClients() {
+    public List<ClientDTO> getAllClients() {
         return clientService.getAllClients();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getClientById(@PathVariable Long id) {
+    public ResponseEntity<ClientDTO> getClientById(@PathVariable Long id) {
         return clientService.getClientById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-phone/{phone}")
-    public ResponseEntity<Client> getClientByPhone(@PathVariable String phone) {
+    public ResponseEntity<ClientDTO> getClientByPhone(@PathVariable String phone) {
         return clientService.getClientByPhone(phone)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-login/{login}")
-    public ResponseEntity<Client> getClientByLogin(@PathVariable String login) {
+    public ResponseEntity<ClientDTO> getClientByLogin(@PathVariable String login) {
         return clientService.getClientByLogin(login)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> replaceClient(@PathVariable Long id, @RequestBody Client newClient) {
+    public ResponseEntity<ClientDTO> replaceClient(@PathVariable Long id, @RequestBody Client newClient) {
         return clientService.replaceClient(id, newClient)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return clientService.updateClient(id, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.services;
 
+import com.example.beauty_salon_booking.dto.ClientDTO;
 import com.example.beauty_salon_booking.entities.Client;
 import com.example.beauty_salon_booking.repositories.ClientRepository;
 import org.springframework.stereotype.Service;
@@ -22,27 +23,28 @@ public class ClientService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<Client> getAllClients() {
-        return clientRepository.findAll();
+    public List<ClientDTO> getAllClients() {
+        return clientRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 
-    public Optional<Client> getClientById(Long id) {
-        return clientRepository.findById(id);
+    public Optional<ClientDTO> getClientById(Long id) {
+        return clientRepository.findById(id).map(this::convertToDTO);
     }
 
-    public Optional<Client> getClientByPhone(String phone) {
-        return clientRepository.findByPhone(phone);
+    public Optional<ClientDTO> getClientByPhone(String phone) {
+        return clientRepository.findByPhone(phone).map(this::convertToDTO);
     }
 
-    public Optional<Client> getClientByLogin(String login) {
-        return clientRepository.findByLogin(login);
+    public Optional<ClientDTO> getClientByLogin(String login) {
+        return clientRepository.findByLogin(login).map(this::convertToDTO);
     }
 
     @Transactional
-    public Client saveClient(Client client) {
-
+    public ClientDTO saveClient(Client client) {
         client.setPassword(passwordEncoder.encode(client.getPassword()));
-        return clientRepository.save(client);
+        return convertToDTO(clientRepository.save(client));
     }
 
     @Transactional
@@ -51,18 +53,18 @@ public class ClientService {
     }
 
     @Transactional
-    public Optional<Client> replaceClient(Long id, Client newClient) {
+    public Optional<ClientDTO> replaceClient(Long id, Client newClient) {
         return clientRepository.findById(id).map(existingClient -> {
             existingClient.setName(newClient.getName());
             existingClient.setPhone(newClient.getPhone());
             existingClient.setLogin(newClient.getLogin());
             existingClient.setPassword(newClient.getPassword());
-            return clientRepository.save(existingClient);
+            return convertToDTO(clientRepository.save(existingClient));
         });
     }
 
     @Transactional
-    public Optional<Client> updateClient(Long id, Map<String, Object> updates) {
+    public Optional<ClientDTO> updateClient(Long id, Map<String, Object> updates) {
         return clientRepository.findById(id).map(existingClient -> {
             if (updates.containsKey("name")) {
                 existingClient.setName((String) updates.get("name"));
@@ -76,7 +78,18 @@ public class ClientService {
             if (updates.containsKey("password")) {
                 existingClient.setPassword(passwordEncoder.encode((String) updates.get("password")));
             }
-            return clientRepository.save(existingClient);
+            return convertToDTO(clientRepository.save(existingClient));
         });
+    }
+
+    private ClientDTO convertToDTO(Client client) {
+        return new ClientDTO(client.getId(), client.getName(), client.getPhone());
+    }
+
+    private Client convertToEntity(ClientDTO dto) {
+        Client client = new Client();
+        client.setName(dto.getName());
+        client.setPhone(dto.getPhone());
+        return client;
     }
 }

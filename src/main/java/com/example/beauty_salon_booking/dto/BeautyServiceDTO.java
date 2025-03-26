@@ -1,7 +1,5 @@
 package com.example.beauty_salon_booking.dto;
 
-import com.example.beauty_salon_booking.entities.Master;
-
 import java.util.List;
 
 public class BeautyServiceDTO {
@@ -11,11 +9,20 @@ public class BeautyServiceDTO {
     private String description;
     private List<MasterDTO> masters;
 
+    public BeautyServiceDTO(Long id, String name, Double price, String description, List<MasterDTO> masters) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.masters = masters;
+    }
+
     public BeautyServiceDTO(Long id, String name, Double price, String description) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.description = description;
+        this.masters = null;
     }
 
     public Long getId() { return id; }

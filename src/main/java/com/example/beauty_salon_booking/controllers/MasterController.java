@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
+import com.example.beauty_salon_booking.dto.MasterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,68 +21,68 @@ public class MasterController {
 
     @Autowired
     public MasterController(MasterService masterService) {
-
         this.masterService = masterService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Master> createMaster(@RequestBody Master master) {
+    public ResponseEntity<MasterDTO> createMaster(@RequestBody Master master) {
         return ResponseEntity.status(HttpStatus.CREATED).body(masterService.saveMaster(master));
     }
 
     @PostMapping("/{masterId}/beauty-services/{beautyServiceId}")
-    public ResponseEntity<Master> addBeautyServiceToMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
-        Master master = masterService.addBeautyServiceToMaster(masterId, beautyServiceId);
-        return ResponseEntity.ok(master);
+    public ResponseEntity<MasterDTO> addBeautyServiceToMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
+        MasterDTO masterDTO = masterService.addBeautyServiceToMaster(masterId, beautyServiceId);
+        return ResponseEntity.ok(masterDTO);
     }
 
     @GetMapping
-    public List<Master> getAllMasters() {
+    public List<MasterDTO> getAllMasters() {
         return masterService.getAllMasters();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Master> getMasterById(@PathVariable Long id) {
+    public ResponseEntity<MasterDTO> getMasterById(@PathVariable Long id) {
         return masterService.getMasterById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-name/{name}")
-    public ResponseEntity<Master> getMasterByName(@PathVariable String name) {
+    public ResponseEntity<MasterDTO> getMasterByName(@PathVariable String name) {
         return masterService.getMasterByName(name)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-phone/{phone}")
-    public ResponseEntity<Master> getMasterByPhone(@PathVariable String phone) {
+    public ResponseEntity<MasterDTO> getMasterByPhone(@PathVariable String phone) {
         return masterService.getMasterByPhone(phone)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-login/{login}")
-    public ResponseEntity<Master> getMasterByLogin(@PathVariable String login) {
+    public ResponseEntity<MasterDTO> getMasterByLogin(@PathVariable String login) {
         return masterService.getMasterByLogin(login)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    ////
     @GetMapping("/{masterId}/beauty-services")
     public ResponseEntity<List<BeautyService>> getBeautyServicesByMasterId(@PathVariable Long masterId) {
         return ResponseEntity.ok(masterService.getBeautyServicesByMasterId(masterId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Master> replaceMaster(@PathVariable Long id, @RequestBody Master newMaster) {
+    public ResponseEntity<MasterDTO> replaceMaster(@PathVariable Long id, @RequestBody Master newMaster) {
         return masterService.replaceMaster(id, newMaster)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Master> updateMaster(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<MasterDTO> updateMaster(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return masterService.updateMaster(id, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

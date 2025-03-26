@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
+import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,52 +25,53 @@ public class BeautyServiceController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<BeautyService> createBeautyService(@RequestBody BeautyService beautyService) {
+    public ResponseEntity<BeautyServiceDTO> createBeautyService(@RequestBody BeautyService beautyService) {
         return ResponseEntity.status(HttpStatus.CREATED).body(beautyServiceService.saveBeautyService(beautyService));
     }
 
     @PostMapping("/{beautyServiceId}/masters/{masterId}")
-    public ResponseEntity<BeautyService> addMasterToBeautyService(@PathVariable Long beautyServiceId, @PathVariable Long masterId) {
-        BeautyService beautyService = beautyServiceService.addMasterToBeautyService(beautyServiceId, masterId);
-        return ResponseEntity.ok(beautyService);
+    public ResponseEntity<BeautyServiceDTO> addMasterToBeautyService(@PathVariable Long beautyServiceId, @PathVariable Long masterId) {
+        BeautyServiceDTO beautyServiceDTO = beautyServiceService.addMasterToBeautyService(beautyServiceId, masterId);
+        return ResponseEntity.ok(beautyServiceDTO);
     }
 
     @GetMapping
-    public List<BeautyService> getAllBeautyServices() { return beautyServiceService.getAllBeautyServices(); }
+    public List<BeautyServiceDTO> getAllBeautyServices() { return beautyServiceService.getAllBeautyServices(); }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BeautyService> getBeautyServiceById(@PathVariable Long id) {
+    public ResponseEntity<BeautyServiceDTO> getBeautyServiceById(@PathVariable Long id) {
         return beautyServiceService.getBeautyServiceById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-name/{name}")
-    public ResponseEntity<BeautyService> getBeautyServiceByName(@PathVariable String name) {
+    public ResponseEntity<BeautyServiceDTO> getBeautyServiceByName(@PathVariable String name) {
         return beautyServiceService.getBeautyServiceByName(name)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/price-range")
-    public ResponseEntity<List<BeautyService>> getBeautyServiceByPriceRange(@RequestParam double minPrice, @RequestParam double maxPrice) {
+    public ResponseEntity<List<BeautyServiceDTO>> getBeautyServiceByPriceRange(@RequestParam double minPrice, @RequestParam double maxPrice) {
         return ResponseEntity.ok(beautyServiceService.getBeautyServicesByPriceRange(minPrice, maxPrice));
     }
 
+    ///
     @GetMapping("/{beautyServiceId}/masters")
     public ResponseEntity<List<Master>> getMastersByBeautyServiceId(@PathVariable Long beautyServiceId) {
         return ResponseEntity.ok(beautyServiceService.getMastersByBeautyServiceId(beautyServiceId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BeautyService> replaceBeautyService(@PathVariable Long id, @RequestBody BeautyService newBeautyService) {
+    public ResponseEntity<BeautyServiceDTO> replaceBeautyService(@PathVariable Long id, @RequestBody BeautyService newBeautyService) {
         return beautyServiceService.replaceService(id, newBeautyService)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<BeautyService> updateBeautyService(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<BeautyServiceDTO> updateBeautyService(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return beautyServiceService.updateService(id, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

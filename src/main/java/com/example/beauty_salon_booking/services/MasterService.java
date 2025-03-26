@@ -1,5 +1,9 @@
 package com.example.beauty_salon_booking.services;
 
+import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
+import com.example.beauty_salon_booking.dto.ClientDTO;
+import com.example.beauty_salon_booking.dto.MasterDTO;
+import com.example.beauty_salon_booking.entities.Client;
 import com.example.beauty_salon_booking.entities.Master;
 import com.example.beauty_salon_booking.entities.BeautyService;
 import com.example.beauty_salon_booking.repositories.MasterRepository;
@@ -14,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class MasterService {
@@ -27,28 +32,32 @@ public class MasterService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<Master> getAllMasters() {
-        return masterRepository.findAll();
+    public List<MasterDTO> getAllMasters() {
+        return masterRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 
-    public Optional<Master> getMasterById(Long id) {
-        return masterRepository.findById(id);
+    public Optional<MasterDTO> getMasterById(Long id) {
+        return masterRepository.findById(id).map(this::convertToDTO);
     }
 
-    public Optional<Master> getMasterByName(String name) { return masterRepository.findByName(name); }
-
-    public Optional<Master> getMasterByPhone(String phone) {
-        return masterRepository.findByPhone(phone);
+    public Optional<MasterDTO> getMasterByName(String name) {
+        return masterRepository.findByName(name).map(this::convertToDTO);
     }
 
-    public Optional<Master> getMasterByLogin(String login) {
-        return masterRepository.findByLogin(login);
+    public Optional<MasterDTO> getMasterByPhone(String phone) {
+        return masterRepository.findByPhone(phone).map(this::convertToDTO);
+    }
+
+    public Optional<MasterDTO> getMasterByLogin(String login) {
+        return masterRepository.findByLogin(login).map(this::convertToDTO);
     }
 
     @Transactional
-    public Master saveMaster(Master master) {
+    public MasterDTO saveMaster(Master master) {
         master.setPassword(passwordEncoder.encode(master.getPassword()));
-        return masterRepository.save(master);
+        return convertToDTO(masterRepository.save(master));
     }
 
     @Transactional
@@ -57,18 +66,18 @@ public class MasterService {
     }
 
     @Transactional
-    public Optional<Master> replaceMaster(Long id, Master newMaster) {
+    public Optional<MasterDTO> replaceMaster(Long id, Master newMaster) {
         return masterRepository.findById(id).map(existingMaster -> {
             existingMaster.setName(newMaster.getName());
             existingMaster.setPhone(newMaster.getPhone());
             existingMaster.setLogin(newMaster.getLogin());
             existingMaster.setPassword(newMaster.getPassword());
-            return masterRepository.save(existingMaster);
+            return convertToDTO(masterRepository.save(existingMaster));
         });
     }
 
     @Transactional
-    public Optional<Master> updateMaster(Long id, Map<String, Object> updates) {
+    public Optional<MasterDTO> updateMaster(Long id, Map<String, Object> updates) {
         return masterRepository.findById(id).map(existingMaster -> {
             if (updates.containsKey("name")) {
                 existingMaster.setName((String) updates.get("name"));
@@ -82,10 +91,11 @@ public class MasterService {
             if (updates.containsKey("password")) {
                 existingMaster.setPassword(passwordEncoder.encode((String) updates.get("password")));
             }
-            return masterRepository.save(existingMaster);
+            return convertToDTO(masterRepository.save(existingMaster));
         });
     }
 
+    ///
     public List<BeautyService> getBeautyServicesByMasterId(Long masterId) {
         return masterRepository.findById(masterId)
                 .map(Master::getBeautyServices)
@@ -93,24 +103,48 @@ public class MasterService {
     }
 
     @Transactional
-    public Master addBeautyServiceToMaster(Long masterId, Long beautyServiceId) {
+    public MasterDTO addBeautyServiceToMaster(Long masterId, Long beautyServiceId) {
         Master master = masterRepository.findById(masterId)
                 .orElseThrow(() -> new EntityNotFoundException("Master not found"));
         BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId)
                 .orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
 
         master.addBeautyService(beautyService);
-        return masterRepository.save(master);
+        return convertToDTO(masterRepository.save(master));
     }
 
     @Transactional
-    public Master removeBeautyServiceFromMaster(Long masterId, Long beautyServiceId) {
+    public MasterDTO removeBeautyServiceFromMaster(Long masterId, Long beautyServiceId) {
         Master master = masterRepository.findById(masterId).
                 orElseThrow(() -> new EntityNotFoundException("Master not found"));
         BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId).
                 orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
 
         master.removeBeautyService(beautyService);
-        return masterRepository.save(master);
+        return convertToDTO(masterRepository.save(master));
+    }
+
+    private MasterDTO convertToDTO(Master master) {
+        List<BeautyServiceDTO> beautyServiceDTOs = master.getBeautyServices().stream()
+                .map(beautyService -> new BeautyServiceDTO(
+                        beautyService.getId(),
+                        beautyService.getName(),
+                        beautyService.getPrice(),
+                        beautyService.getDescription()
+                ))
+                .toList();
+
+        return new MasterDTO(
+                master.getId(),
+                master.getName(),
+                master.getPhone(),
+                beautyServiceDTOs);
+    }
+
+    private Client convertToEntity(ClientDTO dto) {
+        Client client = new Client();
+        client.setName(dto.getName());
+        client.setPhone(dto.getPhone());
+        return client;
     }
 }

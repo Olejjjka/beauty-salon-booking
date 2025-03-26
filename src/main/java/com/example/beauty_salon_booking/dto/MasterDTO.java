@@ -8,10 +8,18 @@ public class MasterDTO {
     private String phone;
     private List<BeautyServiceDTO> beautyServices;
 
+    public MasterDTO(Long id, String name, String phone, List<BeautyServiceDTO> beautyServices) {
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+        this.beautyServices = beautyServices;
+    }
+
     public MasterDTO(Long id, String name, String phone) {
         this.id = id;
         this.name = name;
         this.phone = phone;
+        this.beautyServices = null;
     }
 
     public Long getId() { return id; }

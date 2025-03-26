@@ -1,6 +1,7 @@
 package com.example.beauty_salon_booking.services;
 
 import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
+import com.example.beauty_salon_booking.dto.DTOConverter;
 import com.example.beauty_salon_booking.dto.MasterDTO;
 import com.example.beauty_salon_booking.entities.BeautyService;
 import com.example.beauty_salon_booking.entities.Master;
@@ -17,40 +18,42 @@ import java.util.Collections;
 
 @Service
 public class BeautyServiceService {
+
     private final BeautyServiceRepository beautyServiceRepository;
     private final MasterRepository masterRepository;
-    private final MasterService masterService;
+    private final DTOConverter dtoConverter;
 
-    public BeautyServiceService(BeautyServiceRepository beautyServiceRepository, MasterRepository masterRepository,
-                                MasterService masterService) {
+    public BeautyServiceService(BeautyServiceRepository beautyServiceRepository,
+                                MasterRepository masterRepository,
+                                DTOConverter dtoConverter) {
         this.beautyServiceRepository = beautyServiceRepository;
         this.masterRepository = masterRepository;
-        this.masterService = masterService;
+        this.dtoConverter = dtoConverter;
     }
 
     public List<BeautyServiceDTO> getAllBeautyServices() {
         return beautyServiceRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(dtoConverter::convertToBeautyServiceDTO)
                 .toList();
     }
 
     public Optional<BeautyServiceDTO> getBeautyServiceById(Long id) {
-        return beautyServiceRepository.findById(id).map(this::convertToDTO);
+        return beautyServiceRepository.findById(id).map(dtoConverter::convertToBeautyServiceDTO);
     }
 
     public Optional<BeautyServiceDTO> getBeautyServiceByName(String name) {
-        return beautyServiceRepository.findByName(name).map(this::convertToDTO);
+        return beautyServiceRepository.findByName(name).map(dtoConverter::convertToBeautyServiceDTO);
     }
 
     public List<BeautyServiceDTO> getBeautyServicesByPriceRange(double min, double max) {
         return beautyServiceRepository.findByPriceBetween(min, max).stream()
-                .map(this::convertToDTO)
+                .map(dtoConverter::convertToBeautyServiceDTO)
                 .toList();
     }
 
     @Transactional
     public BeautyServiceDTO saveBeautyService(BeautyService beautyService) {
-        return convertToDTO(beautyServiceRepository.save(beautyService));
+        return dtoConverter.convertToBeautyServiceDTO(beautyServiceRepository.save(beautyService));
     }
 
     @Transactional
@@ -64,7 +67,7 @@ public class BeautyServiceService {
             existingService.setName(newService.getName());
             existingService.setPrice(newService.getPrice());
             existingService.setDescription(newService.getDescription());
-            return convertToDTO(beautyServiceRepository.save(existingService));
+            return dtoConverter.convertToBeautyServiceDTO(beautyServiceRepository.save(existingService));
         });
     }
 
@@ -80,14 +83,14 @@ public class BeautyServiceService {
             if (updates.containsKey("description")) {
                 existingService.setDescription((String) updates.get("description"));
             }
-            return convertToDTO(beautyServiceRepository.save(existingService));
+            return dtoConverter.convertToBeautyServiceDTO(beautyServiceRepository.save(existingService));
         });
     }
 
     public List<MasterDTO> getMastersByBeautyServiceId(Long beautyServiceId) {
         return beautyServiceRepository.findById(beautyServiceId)
                 .map(beautyService -> beautyService.getMasters().stream()
-                        .map(masterService::convertToDTO)
+                        .map(dtoConverter::convertToMasterDTO)
                         .toList()
                 )
                 .orElse(Collections.emptyList());
@@ -101,7 +104,7 @@ public class BeautyServiceService {
                 .orElseThrow(() -> new EntityNotFoundException("Master not found"));
 
         beautyService.addMaster(master);
-        return convertToDTO(beautyServiceRepository.save(beautyService));
+        return dtoConverter.convertToBeautyServiceDTO(beautyServiceRepository.save(beautyService));
     }
 
     @Transactional
@@ -112,24 +115,6 @@ public class BeautyServiceService {
                 .orElseThrow(() -> new EntityNotFoundException("Master not found"));
 
         beautyService.removeMaster(master);
-        return convertToDTO(beautyServiceRepository.save(beautyService));
+        return dtoConverter.convertToBeautyServiceDTO(beautyServiceRepository.save(beautyService));
     }
-
-    protected BeautyServiceDTO convertToDTO(BeautyService beautyService) {
-        List<MasterDTO> masterDTOs = beautyService.getMasters().stream()
-                .map(master -> new MasterDTO(
-                        master.getId(),
-                        master.getName(),
-                        master.getPhone()
-                ))
-                .toList();
-
-        return new BeautyServiceDTO(
-                beautyService.getId(),
-                beautyService.getName(),
-                beautyService.getPrice(),
-                beautyService.getDescription(),
-                masterDTOs);
-    }
-
 }

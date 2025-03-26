@@ -1,6 +1,7 @@
 package com.example.beauty_salon_booking.dto;
 
 public class ClientDTO {
+
     private Long id;
     private String name;
     private String phone;

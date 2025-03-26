@@ -1,6 +1,7 @@
 package com.example.beauty_salon_booking.services;
 
 import com.example.beauty_salon_booking.dto.ClientDTO;
+import com.example.beauty_salon_booking.dto.DTOConverter;
 import com.example.beauty_salon_booking.entities.Client;
 import com.example.beauty_salon_booking.repositories.ClientRepository;
 import org.springframework.stereotype.Service;
@@ -14,37 +15,41 @@ import java.util.Map;
 
 @Service
 public class ClientService {
+
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DTOConverter dtoConverter;
 
-    public ClientService(ClientRepository clientRepository, PasswordEncoder passwordEncoder) {
-
+    public ClientService(ClientRepository clientRepository,
+                         PasswordEncoder passwordEncoder,
+                         DTOConverter dtoConverter) {
         this.clientRepository = clientRepository;
         this.passwordEncoder = passwordEncoder;
+        this.dtoConverter = dtoConverter;
     }
 
     public List<ClientDTO> getAllClients() {
         return clientRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(dtoConverter::convertToClientDTO)
                 .toList();
     }
 
     public Optional<ClientDTO> getClientById(Long id) {
-        return clientRepository.findById(id).map(this::convertToDTO);
+        return clientRepository.findById(id).map(dtoConverter::convertToClientDTO);
     }
 
     public Optional<ClientDTO> getClientByPhone(String phone) {
-        return clientRepository.findByPhone(phone).map(this::convertToDTO);
+        return clientRepository.findByPhone(phone).map(dtoConverter::convertToClientDTO);
     }
 
     public Optional<ClientDTO> getClientByLogin(String login) {
-        return clientRepository.findByLogin(login).map(this::convertToDTO);
+        return clientRepository.findByLogin(login).map(dtoConverter::convertToClientDTO);
     }
 
     @Transactional
     public ClientDTO saveClient(Client client) {
         client.setPassword(passwordEncoder.encode(client.getPassword()));
-        return convertToDTO(clientRepository.save(client));
+        return dtoConverter.convertToClientDTO(clientRepository.save(client));
     }
 
     @Transactional
@@ -59,7 +64,7 @@ public class ClientService {
             existingClient.setPhone(newClient.getPhone());
             existingClient.setLogin(newClient.getLogin());
             existingClient.setPassword(newClient.getPassword());
-            return convertToDTO(clientRepository.save(existingClient));
+            return dtoConverter.convertToClientDTO(clientRepository.save(existingClient));
         });
     }
 
@@ -78,18 +83,7 @@ public class ClientService {
             if (updates.containsKey("password")) {
                 existingClient.setPassword(passwordEncoder.encode((String) updates.get("password")));
             }
-            return convertToDTO(clientRepository.save(existingClient));
+            return dtoConverter.convertToClientDTO(clientRepository.save(existingClient));
         });
-    }
-
-    private ClientDTO convertToDTO(Client client) {
-        return new ClientDTO(client.getId(), client.getName(), client.getPhone());
-    }
-
-    private Client convertToEntity(ClientDTO dto) {
-        Client client = new Client();
-        client.setName(dto.getName());
-        client.setPhone(dto.getPhone());
-        return client;
     }
 }

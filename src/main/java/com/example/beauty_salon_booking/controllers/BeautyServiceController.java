@@ -12,12 +12,11 @@ import java.util.Map;
 
 import com.example.beauty_salon_booking.entities.BeautyService;
 import com.example.beauty_salon_booking.services.BeautyServiceService;
-import com.example.beauty_salon_booking.entities.Master;
-import com.example.beauty_salon_booking.services.MasterService;
 
 @RestController
 @RequestMapping("/beauty-services")
 public class BeautyServiceController {
+
     private final BeautyServiceService beautyServiceService;
 
     @Autowired
@@ -37,7 +36,9 @@ public class BeautyServiceController {
     }
 
     @GetMapping
-    public List<BeautyServiceDTO> getAllBeautyServices() { return beautyServiceService.getAllBeautyServices(); }
+    public List<BeautyServiceDTO> getAllBeautyServices() {
+        return beautyServiceService.getAllBeautyServices();
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<BeautyServiceDTO> getBeautyServiceById(@PathVariable Long id) {

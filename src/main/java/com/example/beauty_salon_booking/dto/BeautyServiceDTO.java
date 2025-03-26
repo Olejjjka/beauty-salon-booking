@@ -3,6 +3,7 @@ package com.example.beauty_salon_booking.dto;
 import java.util.List;
 
 public class BeautyServiceDTO {
+
     private Long id;
     private String name;
     private Double price;

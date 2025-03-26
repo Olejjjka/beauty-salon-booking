@@ -12,12 +12,11 @@ import java.util.Map;
 
 import com.example.beauty_salon_booking.entities.Master;
 import com.example.beauty_salon_booking.services.MasterService;
-import com.example.beauty_salon_booking.entities.BeautyService;
-import com.example.beauty_salon_booking.services.BeautyServiceService;
 
 @RestController
 @RequestMapping("/masters")
 public class MasterController {
+
     private final MasterService masterService;
 
     @Autowired

@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
+import com.example.beauty_salon_booking.dto.AppointmentDTO;
 import com.example.beauty_salon_booking.enums.AppointmentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,69 +26,57 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
-    //@PostMapping("/create")
-    //public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
-    //    return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.saveAppointment(appointment));
-    //}
-
     @PostMapping("/create")
-    public ResponseEntity<Appointment> createAppointment(@RequestBody Map<String, Object> payload) {
-        Long clientId = ((Number) payload.get("clientId")).longValue();
-        Long masterId = ((Number) payload.get("masterId")).longValue();
-        Long beautyServiceId = ((Number) payload.get("beautyServiceId")).longValue();
-        LocalDate date = LocalDate.parse((String) payload.get("date"));
-        LocalTime time = LocalTime.parse((String) payload.get("time"));
-        AppointmentStatus status = AppointmentStatus.valueOf((String) payload.get("status"));
-
-        Appointment appointment = appointmentService.createAppointment(clientId, masterId, beautyServiceId, date, time, status);
-        return ResponseEntity.status(HttpStatus.CREATED).body(appointment);
+    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> payload) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(payload));
     }
 
-
     @GetMapping
-    public List<Appointment> getAllAppointments() { return appointmentService.getAllAppointments(); }
+    public List<AppointmentDTO> getAllAppointments() {
+        return appointmentService.getAllAppointments();
+    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long id) {
+    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long id) {
         return appointmentService.getAppointmentById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByClient(@PathVariable Long clientId) {
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByClient(@PathVariable Long clientId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByClientId(clientId));
     }
 
     @GetMapping("/master/{masterId}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByMaster(@PathVariable Long masterId) {
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMaster(@PathVariable Long masterId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByMasterId(masterId));
     }
 
     @GetMapping("/beautyService/{beautyServiceId}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByBeautyServiceId(@PathVariable Long beautyServiceId) {
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByBeautyServiceId(@PathVariable Long beautyServiceId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByBeautyServiceId(beautyServiceId));
     }
 
     @GetMapping("/dateAndTime/{dateAndTime}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByDateAndTime(@PathVariable LocalDate date, LocalTime time) {
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByDateAndTime(@PathVariable LocalDate date, LocalTime time) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByDateAndTime(date, time));
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByStatus(@PathVariable AppointmentStatus status) {
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByStatus(@PathVariable AppointmentStatus status) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByStatus(status));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Appointment> replaceAppointment(@PathVariable Long id, @RequestBody Appointment newAppointment) {
+    public ResponseEntity<AppointmentDTO> replaceAppointment(@PathVariable Long id, @RequestBody Appointment newAppointment) {
         return appointmentService.replaceAppointment(id, newAppointment)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Appointment> updateAppointment(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<AppointmentDTO> updateAppointment(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return appointmentService.updateAppointment(id, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

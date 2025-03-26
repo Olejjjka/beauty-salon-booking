@@ -16,6 +16,7 @@ import com.example.beauty_salon_booking.services.ClientService;
 @RestController
 @RequestMapping("/clients")
 public class ClientController {
+
     private final ClientService clientService;
 
     @Autowired

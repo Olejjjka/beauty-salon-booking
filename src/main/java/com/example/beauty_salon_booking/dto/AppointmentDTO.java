@@ -1,18 +1,21 @@
 package com.example.beauty_salon_booking.dto;
 
+import com.example.beauty_salon_booking.enums.AppointmentStatus;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class AppointmentDTO {
+
     private Long id;
     private ClientDTO client;
     private MasterDTO master;
     private BeautyServiceDTO beautyService;
     private LocalDate date;
     private LocalTime time;
-    private String status;
+    private AppointmentStatus status;
 
-    public AppointmentDTO(Long id, ClientDTO client, MasterDTO master, BeautyServiceDTO beautyService, LocalDate date, LocalTime time, String status) {
+    public AppointmentDTO(Long id, ClientDTO client, MasterDTO master, BeautyServiceDTO beautyService, LocalDate date, LocalTime time, AppointmentStatus status) {
         this.id = id;
         this.client = client;
         this.master = master;
@@ -40,6 +43,6 @@ public class AppointmentDTO {
     public LocalTime getTime() { return time; }
     public void setTime(LocalTime time) { this.time = time; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public AppointmentStatus getStatus() { return status; }
+    public void setStatus(AppointmentStatus status) { this.status = status; }
 }

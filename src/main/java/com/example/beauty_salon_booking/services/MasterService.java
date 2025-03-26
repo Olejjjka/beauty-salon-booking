@@ -1,6 +1,7 @@
 package com.example.beauty_salon_booking.services;
 
 import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
+import com.example.beauty_salon_booking.dto.DTOConverter;
 import com.example.beauty_salon_booking.dto.MasterDTO;
 import com.example.beauty_salon_booking.entities.Master;
 import com.example.beauty_salon_booking.entities.BeautyService;
@@ -20,46 +21,49 @@ import java.util.Map;
 
 @Service
 public class MasterService {
+
     private final MasterRepository masterRepository;
     private final BeautyServiceRepository beautyServiceRepository;
     private final PasswordEncoder passwordEncoder;
-    private final BeautyServiceService beautyServiceService;
+    private final DTOConverter dtoConverter;
 
     @Autowired
-    public MasterService(MasterRepository masterRepository, BeautyServiceRepository beautyServiceRepository,
-                         PasswordEncoder passwordEncoder, BeautyServiceService beautyServiceService) {
+    public MasterService(MasterRepository masterRepository,
+                         BeautyServiceRepository beautyServiceRepository,
+                         PasswordEncoder passwordEncoder,
+                         DTOConverter dtoConverter) {
         this.masterRepository = masterRepository;
         this.beautyServiceRepository = beautyServiceRepository;
         this.passwordEncoder = passwordEncoder;
-        this.beautyServiceService = beautyServiceService;
+        this.dtoConverter = dtoConverter;
     }
 
     public List<MasterDTO> getAllMasters() {
         return masterRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(dtoConverter::convertToMasterDTO)
                 .toList();
     }
 
     public Optional<MasterDTO> getMasterById(Long id) {
-        return masterRepository.findById(id).map(this::convertToDTO);
+        return masterRepository.findById(id).map(dtoConverter::convertToMasterDTO);
     }
 
     public Optional<MasterDTO> getMasterByName(String name) {
-        return masterRepository.findByName(name).map(this::convertToDTO);
+        return masterRepository.findByName(name).map(dtoConverter::convertToMasterDTO);
     }
 
     public Optional<MasterDTO> getMasterByPhone(String phone) {
-        return masterRepository.findByPhone(phone).map(this::convertToDTO);
+        return masterRepository.findByPhone(phone).map(dtoConverter::convertToMasterDTO);
     }
 
     public Optional<MasterDTO> getMasterByLogin(String login) {
-        return masterRepository.findByLogin(login).map(this::convertToDTO);
+        return masterRepository.findByLogin(login).map(dtoConverter::convertToMasterDTO);
     }
 
     @Transactional
     public MasterDTO saveMaster(Master master) {
         master.setPassword(passwordEncoder.encode(master.getPassword()));
-        return convertToDTO(masterRepository.save(master));
+        return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 
     @Transactional
@@ -74,7 +78,7 @@ public class MasterService {
             existingMaster.setPhone(newMaster.getPhone());
             existingMaster.setLogin(newMaster.getLogin());
             existingMaster.setPassword(newMaster.getPassword());
-            return convertToDTO(masterRepository.save(existingMaster));
+            return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
         });
     }
 
@@ -93,14 +97,14 @@ public class MasterService {
             if (updates.containsKey("password")) {
                 existingMaster.setPassword(passwordEncoder.encode((String) updates.get("password")));
             }
-            return convertToDTO(masterRepository.save(existingMaster));
+            return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
         });
     }
 
     public List<BeautyServiceDTO> getBeautyServicesByMasterId(Long masterId) {
         return masterRepository.findById(masterId)
                 .map(master -> master.getBeautyServices().stream()
-                        .map(beautyServiceService::convertToDTO)
+                        .map(dtoConverter::convertToBeautyServiceDTO)
                         .toList()
                 )
                 .orElse(Collections.emptyList());
@@ -114,7 +118,7 @@ public class MasterService {
                 .orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
 
         master.addBeautyService(beautyService);
-        return convertToDTO(masterRepository.save(master));
+        return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 
     @Transactional
@@ -125,23 +129,6 @@ public class MasterService {
                 orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
 
         master.removeBeautyService(beautyService);
-        return convertToDTO(masterRepository.save(master));
-    }
-
-    protected MasterDTO convertToDTO(Master master) {
-        List<BeautyServiceDTO> beautyServiceDTOs = master.getBeautyServices().stream()
-                .map(beautyService -> new BeautyServiceDTO(
-                        beautyService.getId(),
-                        beautyService.getName(),
-                        beautyService.getPrice(),
-                        beautyService.getDescription()
-                ))
-                .toList();
-
-        return new MasterDTO(
-                master.getId(),
-                master.getName(),
-                master.getPhone(),
-                beautyServiceDTOs);
+        return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 }

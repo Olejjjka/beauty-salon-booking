@@ -2,6 +2,9 @@ package com.example.beauty_salon_booking.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "masters")
 public class Master {
@@ -10,7 +13,7 @@ public class Master {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "master_name", nullable = false)
     private String name;
 
     @Column(nullable = false, unique = true)
@@ -21,6 +24,14 @@ public class Master {
 
     @Column(nullable = false)
     private String password;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "master_beauty_services",
+            joinColumns = @JoinColumn(name = "master_id"),
+            inverseJoinColumns = @JoinColumn(name = "beauty_service_id")
+    )
+    private List<BeautyService> beautyServices = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -60,5 +71,27 @@ public class Master {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<BeautyService> getBeautyServices() {
+        return beautyServices;
+    }
+
+    public void setBeautyServices(List<BeautyService> beautyServices) {
+        this.beautyServices = beautyServices;
+    }
+
+    public void addBeautyService(BeautyService beautyService) {
+        if (!beautyServices.contains(beautyService)) {
+            beautyServices.add(beautyService);
+            beautyService.getMasters().add(this);
+        }
+    }
+
+    public void removeBeautyService(BeautyService beautyService) {
+        if (beautyServices.contains(beautyService)) {
+            beautyServices.remove(beautyService);
+            beautyService.getMasters().remove(this);
+        }
     }
 }

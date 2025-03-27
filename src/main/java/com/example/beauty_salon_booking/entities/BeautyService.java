@@ -2,6 +2,9 @@ package com.example.beauty_salon_booking.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "beauty_services")
 public class BeautyService {
@@ -15,6 +18,12 @@ public class BeautyService {
 
     @Column(nullable = false)
     private Double price;
+
+    @Column(nullable = false)
+    private String description;
+
+    @ManyToMany(mappedBy = "beautyServices", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Master> masters = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -38,5 +47,31 @@ public class BeautyService {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
+
+    public List<Master> getMasters() {
+        return masters;
+    }
+
+    public void setMasters(List<Master> masters) {
+        this.masters = masters;
+    }
+
+    public void addMaster(Master master) {
+        if (!masters.contains(master)) {
+            masters.add(master);
+            master.getBeautyServices().add(this);
+        }
+    }
+
+    public void removeMaster(Master master) {
+        if (masters.contains(master)) {
+            masters.remove(master);
+            master.getBeautyServices().remove(this);
+        }
     }
 }

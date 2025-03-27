@@ -1,11 +1,14 @@
 package com.example.beauty_salon_booking.controllers;
 
+import com.example.beauty_salon_booking.dto.AppointmentDTO;
+import com.example.beauty_salon_booking.dto.ClientDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.List;
 
 import com.example.beauty_salon_booking.entities.Client;
 import com.example.beauty_salon_booking.services.ClientService;
@@ -14,6 +17,7 @@ import com.example.beauty_salon_booking.services.ClientService;
 @RestController
 @RequestMapping("/clients")
 public class ClientController {
+
     private final ClientService clientService;
 
     @Autowired
@@ -22,41 +26,54 @@ public class ClientController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Client> registerClient(@RequestBody Client client) {
-        Client savedClient = clientService.saveClient(client);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedClient);
+    public ResponseEntity<ClientDTO> createClient(@RequestBody Client client) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(clientService.saveClient(client));
+    }
+
+    @GetMapping
+    public List<ClientDTO> getAllClients() {
+        return clientService.getAllClients();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getClientById(@PathVariable Long id) {
+    public ResponseEntity<ClientDTO> getClientById(@PathVariable Long id) {
         return clientService.getClientById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-phone/{phone}")
-    public ResponseEntity<Client> getClientByPhone(@PathVariable String phone) {
+    public ResponseEntity<ClientDTO> getClientByPhone(@PathVariable String phone) {
         return clientService.getClientByPhone(phone)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-login/{login}")
-    public ResponseEntity<Client> getClientByLogin(@PathVariable String login) {
+    public ResponseEntity<ClientDTO> getClientByLogin(@PathVariable String login) {
         return clientService.getClientByLogin(login)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{id}/appointments")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByClientId(@PathVariable Long id) {
+        List<AppointmentDTO> appointments = clientService.getAppointmentsByClientId(id);
+        if (appointments.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(appointments);
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Client> replaceClient(@PathVariable Long id, @RequestBody Client newClient) {
+    public ResponseEntity<ClientDTO> replaceClient(@PathVariable Long id, @RequestBody Client newClient) {
         return clientService.replaceClient(id, newClient)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return clientService.updateClient(id, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -68,4 +85,3 @@ public class ClientController {
         return ResponseEntity.noContent().build();
     }
 }
-

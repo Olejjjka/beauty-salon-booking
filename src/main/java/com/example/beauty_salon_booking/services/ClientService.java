@@ -1,8 +1,10 @@
 package com.example.beauty_salon_booking.services;
 
+import com.example.beauty_salon_booking.dto.AppointmentDTO;
 import com.example.beauty_salon_booking.dto.ClientDTO;
 import com.example.beauty_salon_booking.dto.DTOConverter;
 import com.example.beauty_salon_booking.entities.Client;
+import com.example.beauty_salon_booking.repositories.AppointmentRepository;
 import com.example.beauty_salon_booking.repositories.ClientRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +19,16 @@ import java.util.Map;
 public class ClientService {
 
     private final ClientRepository clientRepository;
+    private final AppointmentRepository appointmentRepository;
     private final PasswordEncoder passwordEncoder;
     private final DTOConverter dtoConverter;
 
     public ClientService(ClientRepository clientRepository,
+                         AppointmentRepository appointmentRepository,
                          PasswordEncoder passwordEncoder,
                          DTOConverter dtoConverter) {
         this.clientRepository = clientRepository;
+        this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.dtoConverter = dtoConverter;
     }
@@ -44,6 +49,12 @@ public class ClientService {
 
     public Optional<ClientDTO> getClientByLogin(String login) {
         return clientRepository.findByLogin(login).map(dtoConverter::convertToClientDTO);
+    }
+
+    public List<AppointmentDTO> getAppointmentsByClientId(Long clientId) {
+        return appointmentRepository.findByClientId(clientId).stream()
+                .map(dtoConverter::convertToAppointmentDTO)
+                .toList();
     }
 
     @Transactional

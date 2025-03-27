@@ -2,6 +2,7 @@ package com.example.beauty_salon_booking.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,7 +23,7 @@ public class BeautyService {
     private String description;
 
     @ManyToMany(mappedBy = "beautyServices", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Master> masters;
+    private List<Master> masters = new ArrayList<>();
 
     public Long getId() {
         return id;

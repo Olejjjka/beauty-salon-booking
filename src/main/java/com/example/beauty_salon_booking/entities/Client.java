@@ -10,7 +10,7 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "client_name", nullable = false)
     private String name;
 
     @Column(nullable = false, unique = true)

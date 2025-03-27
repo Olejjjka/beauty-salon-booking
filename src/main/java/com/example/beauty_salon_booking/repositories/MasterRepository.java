@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface MasterRepository extends JpaRepository<Master, Long> {
+
     Optional<Master> findByName(String name);
 
     Optional<Master> findByPhone(String phone);

@@ -1,9 +1,6 @@
 package com.example.beauty_salon_booking.services;
 
-import com.example.beauty_salon_booking.dto.AppointmentDTO;
-import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
-import com.example.beauty_salon_booking.dto.DTOConverter;
-import com.example.beauty_salon_booking.dto.MasterDTO;
+import com.example.beauty_salon_booking.dto.*;
 import com.example.beauty_salon_booking.entities.Appointment;
 import com.example.beauty_salon_booking.entities.Master;
 import com.example.beauty_salon_booking.entities.BeautyService;
@@ -28,22 +25,21 @@ public class MasterService {
 
     private final MasterRepository masterRepository;
     private final BeautyServiceRepository beautyServiceRepository;
+    private final AppointmentRepository appointmentRepository;
     private final PasswordEncoder passwordEncoder;
     private final DTOConverter dtoConverter;
-
-    private final AppointmentRepository appointmentRepository;
 
     @Autowired
     public MasterService(MasterRepository masterRepository,
                          BeautyServiceRepository beautyServiceRepository,
+                         AppointmentRepository appointmentRepository,
                          PasswordEncoder passwordEncoder,
-                         DTOConverter dtoConverter,
-                         AppointmentRepository appointmentRepository) {
+                         DTOConverter dtoConverter) {
         this.masterRepository = masterRepository;
         this.beautyServiceRepository = beautyServiceRepository;
+        this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.dtoConverter = dtoConverter;
-        this.appointmentRepository = appointmentRepository;
     }
 
     public List<MasterDTO> getAllMasters() {
@@ -146,7 +142,6 @@ public class MasterService {
         return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 
-
     private List<AvailableTimeSlotDTO> calculateAvailableSlots(List<Appointment> appointments) {
         LocalTime startOfDay = LocalTime.of(9, 0);
         LocalTime endOfDay = LocalTime.of(19, 0);
@@ -155,7 +150,6 @@ public class MasterService {
 
         List<AvailableTimeSlotDTO> availableTimeSlots = new ArrayList<>();
 
-        // Если записей нет, создаем фиксированные интервалы
         if (appointments.isEmpty()) {
             LocalTime currentStart = startOfDay;
             while (currentStart.plus(serviceDuration).isBefore(endOfDay) || currentStart.plus(serviceDuration).equals(endOfDay)) {
@@ -166,7 +160,6 @@ public class MasterService {
             return availableTimeSlots;
         }
 
-        // Сортируем записи по времени
         List<AvailableTimeSlotDTO> busyIntervals = appointments.stream()
                 .map(appointment -> new AvailableTimeSlotDTO(appointment.getTime(), appointment.getTime().plusHours(2)))
                 .sorted(Comparator.comparing(AvailableTimeSlotDTO::getStart))
@@ -175,17 +168,15 @@ public class MasterService {
         LocalTime currentStart = startOfDay;
 
         for (AvailableTimeSlotDTO busyInterval : busyIntervals) {
-            // Пока есть место перед занятой записью, создаем свободные интервалы
             while (currentStart.plus(serviceDuration).isBefore(busyInterval.getStart()) || currentStart.plus(serviceDuration).equals(busyInterval.getStart())) {
                 LocalTime currentEnd = currentStart.plus(serviceDuration);
                 availableTimeSlots.add(new AvailableTimeSlotDTO(currentStart, currentEnd));
                 currentStart = currentEnd.plus(breakDuration);
             }
-            // Переносим начало следующего свободного слота с учетом перерыва после записи
+
             currentStart = busyInterval.getEnd().plus(breakDuration);
         }
 
-        // Добавляем оставшиеся слоты в конце дня
         while (currentStart.plus(serviceDuration).isBefore(endOfDay) || currentStart.plus(serviceDuration).equals(endOfDay)) {
             LocalTime currentEnd = currentStart.plus(serviceDuration);
             availableTimeSlots.add(new AvailableTimeSlotDTO(currentStart, currentEnd));
@@ -194,8 +185,6 @@ public class MasterService {
 
         return availableTimeSlots;
     }
-
-
 
     public Map<LocalDate, List<AvailableTimeSlotDTO>> getAvailableTimeSlots(Long masterId, LocalDate startDate, LocalDate endDate) {
         Map<LocalDate, List<AvailableTimeSlotDTO>> availableSlotsByDate = new LinkedHashMap<>();
@@ -215,23 +204,5 @@ public class MasterService {
         }
 
         return availableSlotsByDate;
-    }
-
-    public static class AvailableTimeSlotDTO {
-        private LocalTime start;
-        private LocalTime end;
-
-        public AvailableTimeSlotDTO(LocalTime start, LocalTime end) {
-            this.start = start;
-            this.end = end;
-        }
-
-        public LocalTime getStart() {
-            return start;
-        }
-
-        public LocalTime getEnd() {
-            return end;
-        }
     }
 }

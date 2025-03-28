@@ -142,7 +142,7 @@ public class MasterService {
         return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 
-    private List<AvailableTimeSlotDTO> calculateAvailableSlots(List<Appointment> appointments) {
+    private List<AvailableTimeSlotDTO> calculateAvailableSlots(List<AppointmentDTO> appointments) {
         LocalTime startOfDay = LocalTime.of(9, 0);
         LocalTime endOfDay = LocalTime.of(19, 0);
         Duration serviceDuration = Duration.ofHours(2);
@@ -192,8 +192,9 @@ public class MasterService {
         LocalDate currentDate = startDate;
         while (!currentDate.isAfter(endDate)) {
             LocalDate finalDate = currentDate;
-            List<Appointment> appointments = appointmentRepository.findByMasterId(masterId)
+            List<AppointmentDTO> appointments = appointmentRepository.findByMasterId(masterId)
                     .stream()
+                    .map(dtoConverter::convertToAppointmentDTO)
                     .filter(appointment -> appointment.getDate().isEqual(finalDate))
                     .collect(Collectors.toList());
 

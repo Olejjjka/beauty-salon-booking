@@ -16,7 +16,7 @@ import com.example.beauty_salon_booking.entities.Appointment;
 import com.example.beauty_salon_booking.services.AppointmentService;
 
 @RestController
-@RequestMapping("/appointments")
+@RequestMapping("/api/appointments")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;

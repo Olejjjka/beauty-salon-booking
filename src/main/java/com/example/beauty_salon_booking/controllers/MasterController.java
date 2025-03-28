@@ -14,7 +14,7 @@ import com.example.beauty_salon_booking.entities.Master;
 import com.example.beauty_salon_booking.services.MasterService;
 
 @RestController
-@RequestMapping("/masters")
+@RequestMapping("/api/masters")
 public class MasterController {
 
     private final MasterService masterService;

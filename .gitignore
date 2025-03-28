@@ -45,3 +45,7 @@ hs_err_pid*
 
 # DB
 /data/
+
+Dockerfile
+docker-compose.yml
+application.properties

@@ -2,6 +2,7 @@ package com.example.beauty_salon_booking.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,7 +13,7 @@ public class Master {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "master_name", nullable = false)
     private String name;
 
     @Column(nullable = false, unique = true)
@@ -30,7 +31,7 @@ public class Master {
             joinColumns = @JoinColumn(name = "master_id"),
             inverseJoinColumns = @JoinColumn(name = "beauty_service_id")
     )
-    private List<BeautyService> beautyServices;
+    private List<BeautyService> beautyServices = new ArrayList<>();
 
     public Long getId() {
         return id;

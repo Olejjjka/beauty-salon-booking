@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
+import com.example.beauty_salon_booking.dto.AppointmentDTO;
 import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
 import com.example.beauty_salon_booking.dto.MasterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +75,11 @@ public class MasterController {
         return ResponseEntity.ok(masterService.getBeautyServicesByMasterId(masterId));
     }
 
+    @GetMapping("/{masterId}/appointments")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMasterId(@PathVariable Long masterId) {
+        return ResponseEntity.ok(masterService.getAppointmentsByMasterId(masterId));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<MasterDTO> replaceMaster(@PathVariable Long id, @RequestBody Master newMaster) {
         return masterService.replaceMaster(id, newMaster)
@@ -97,5 +104,23 @@ public class MasterController {
     public ResponseEntity<Void> removeBeautyServiceFromMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
         masterService.removeBeautyServiceFromMaster(masterId, beautyServiceId);
         return ResponseEntity.noContent().build();
+    }
+
+
+    // Новый метод для получения доступных интервалов у мастера
+    @GetMapping("/{masterId}/available-time-slots")
+    public ResponseEntity<Map<LocalDate, List<MasterService.AvailableTimeSlotDTO>>> getAvailableTimeSlots(
+            @PathVariable Long masterId,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate) {
+
+        if (endDate.isBefore(startDate)) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        Map<LocalDate, List<MasterService.AvailableTimeSlotDTO>> availableSlots =
+                masterService.getAvailableTimeSlots(masterId, startDate, endDate);
+
+        return ResponseEntity.ok(availableSlots);
     }
 }

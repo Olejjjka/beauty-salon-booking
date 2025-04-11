@@ -55,9 +55,6 @@
 			<scope>test</scope>
 		</dependency>
 
-<<<<<<< Updated upstream
-    </dependencies>
-=======
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
@@ -76,9 +73,7 @@
 			<artifactId>spring-web</artifactId>
 		</dependency>
 
-
 	</dependencies>
->>>>>>> Stashed changes
 
 	<build>
 		<plugins>

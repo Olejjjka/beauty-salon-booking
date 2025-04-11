@@ -1,7 +1,6 @@
 package com.example.beauty_salon_booking.services;
 
 import com.example.beauty_salon_booking.dto.*;
-import com.example.beauty_salon_booking.entities.Appointment;
 import com.example.beauty_salon_booking.entities.Master;
 import com.example.beauty_salon_booking.entities.BeautyService;
 import com.example.beauty_salon_booking.repositories.AppointmentRepository;

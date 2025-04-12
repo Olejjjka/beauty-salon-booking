@@ -6,6 +6,7 @@ import com.example.beauty_salon_booking.dto.TokenResponseDTO;
 import com.example.beauty_salon_booking.security.JwtTokenProvider;
 import com.example.beauty_salon_booking.services.ClientService;
 import com.example.beauty_salon_booking.services.MasterService;
+import com.example.beauty_salon_booking.services.RevokedTokenService; // Импортируем сервис отзыва токенов
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +23,15 @@ public class AuthController {
     private final MasterService masterService;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final RevokedTokenService revokedTokenService;
 
     @Autowired
-    public AuthController(ClientService clientService, MasterService masterService, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
+    public AuthController(ClientService clientService, MasterService masterService, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, RevokedTokenService revokedTokenService) {
         this.clientService = clientService;
         this.masterService = masterService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
+        this.revokedTokenService = revokedTokenService;
     }
 
     // Регистрация клиента
@@ -53,5 +56,19 @@ public class AuthController {
         );
         String token = jwtTokenProvider.generateToken(authentication);
         return ResponseEntity.ok(new TokenResponseDTO(token));
+    }
+
+    // Выход из системы и отзыв токена
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7); // Убираем префикс "Bearer "
+
+        revokedTokenService.revokeToken(token); // Отзываем токен
+
+        return ResponseEntity.ok("Successfully logged out");
     }
 }

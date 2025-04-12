@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.security;
 
+import com.example.beauty_salon_booking.services.RevokedTokenService; // Импортируем сервис
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,9 +16,11 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final RevokedTokenService revokedTokenService; // Внедряем сервис для чёрного списка токенов
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, RevokedTokenService revokedTokenService) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.revokedTokenService = revokedTokenService; // Инициализируем
     }
 
     @Override
@@ -28,6 +31,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = getTokenFromRequest(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
+            // Проверяем, не отозван ли токен
+            if (revokedTokenService.isTokenRevoked(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Возвращаем 401, если токен отозван
+                response.getWriter().write("Token has been revoked");
+                return;
+            }
+
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
             if (authentication instanceof UsernamePasswordAuthenticationToken) {
@@ -40,7 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
 
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");

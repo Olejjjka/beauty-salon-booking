@@ -2,6 +2,8 @@ package com.example.beauty_salon_booking.controllers;
 
 import com.example.beauty_salon_booking.dto.AppointmentDTO;
 import com.example.beauty_salon_booking.dto.ClientDTO;
+import com.example.beauty_salon_booking.dto.PasswordChangeRequest; //
+import com.example.beauty_salon_booking.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +21,12 @@ import com.example.beauty_salon_booking.services.ClientService;
 public class ClientController {
 
     private final ClientService clientService;
+    private final UserService userService;
 
     @Autowired
-    public ClientController(ClientService clientService) {
+    public ClientController(ClientService clientService, UserService userService) {
         this.clientService = clientService;
+        this.userService = userService;
     }
 
     @PostMapping("/register")
@@ -70,6 +74,18 @@ public class ClientController {
         return clientService.replaceClient(id, newClient)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    //
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest, Client authentication) {
+        String username = authentication.getName();
+        boolean isChanged = userService.changePassword(username, passwordChangeRequest.getCurrentPassword(), passwordChangeRequest.getNewPassword());
+        if (isChanged) {
+            return ResponseEntity.ok("Password changed successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Incorrect current password.");
+        }
     }
 
     @PatchMapping("/{id}")

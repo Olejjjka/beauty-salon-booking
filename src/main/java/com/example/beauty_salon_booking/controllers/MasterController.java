@@ -1,9 +1,8 @@
 package com.example.beauty_salon_booking.controllers;
 
-import com.example.beauty_salon_booking.dto.AppointmentDTO;
-import com.example.beauty_salon_booking.dto.AvailableTimeSlotDTO;
-import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
-import com.example.beauty_salon_booking.dto.MasterDTO;
+import com.example.beauty_salon_booking.dto.*;
+import com.example.beauty_salon_booking.entities.Client;
+import com.example.beauty_salon_booking.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +20,12 @@ import com.example.beauty_salon_booking.services.MasterService;
 public class MasterController {
 
     private final MasterService masterService;
+    private final UserService userService;
 
     @Autowired
-    public MasterController(MasterService masterService) {
+    public MasterController(MasterService masterService, UserService userService) {
         this.masterService = masterService;
+        this.userService = userService;
     }
 
     @PostMapping("/register")
@@ -102,6 +103,18 @@ public class MasterController {
         return masterService.replaceMaster(id, newMaster)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    //
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest, Client authentication) {
+        String username = authentication.getName();
+        boolean isChanged = userService.changePassword(username, passwordChangeRequest.getCurrentPassword(), passwordChangeRequest.getNewPassword());
+        if (isChanged) {
+            return ResponseEntity.ok("Password changed successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Incorrect current password.");
+        }
     }
 
     @PatchMapping("/{id}")

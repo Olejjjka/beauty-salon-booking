@@ -54,4 +54,10 @@ public class AuthController {
         String token = jwtTokenProvider.generateToken(authentication);
         return ResponseEntity.ok(new TokenResponseDTO(token));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest request) {
+        String token = authService.authenticate(request.getLogin(), request.getPassword());
+        return ResponseEntity.ok(new JwtResponse(token));
+    }
 }

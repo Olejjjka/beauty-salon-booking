@@ -21,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import org.springframework.http.HttpMethod;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -38,9 +40,20 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Открытые эндпоинты
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/clients/**").hasRole("CLIENT")
-                        .requestMatchers("/masters/**").hasRole("MASTER")
+
+                        // CLIENT: доступ к просмотру мастеров и услуг
+                        .requestMatchers(HttpMethod.GET, "/api/masters/**").hasAnyRole("CLIENT", "MASTER")
+                        .requestMatchers(HttpMethod.GET, "/api/beauty-services/**").hasAnyRole("CLIENT", "MASTER")
+
+                        // CLIENT: доступ к своим данным
+                        .requestMatchers("/api/clients/**").hasRole("CLIENT")
+
+                        // MASTER: доступ к своим данным
+                        .requestMatchers("/api/masters/**").hasRole("MASTER")
+
+                        // Запрет по умолчанию на всё остальное
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

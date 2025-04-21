@@ -26,16 +26,19 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
+    // для всех клиентов
     @PostMapping("/create")
     public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> payload) {
         return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(payload));
     }
 
+    // не надо
     @GetMapping
     public List<AppointmentDTO> getAllAppointments() {
         return appointmentService.getAllAppointments();
     }
 
+    // для причастных клиента и мастера
     @GetMapping("/{id}")
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long id) {
         return appointmentService.getAppointmentById(id)
@@ -43,31 +46,37 @@ public class AppointmentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // для причастного клиента
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByClient(@PathVariable Long clientId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByClientId(clientId));
     }
 
+    // для причастного мастера
     @GetMapping("/master/{masterId}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMaster(@PathVariable Long masterId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByMasterId(masterId));
     }
 
+    // не надо
     @GetMapping("/beautyService/{beautyServiceId}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByBeautyServiceId(@PathVariable Long beautyServiceId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByBeautyServiceId(beautyServiceId));
     }
 
+    // для причастных клиента и мастера
     @GetMapping("/dateAndTime/{dateAndTime}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByDateAndTime(@PathVariable LocalDate date, LocalTime time) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByDateAndTime(date, time));
     }
 
+    // для причастных клиента и мастера
     @GetMapping("/status/{status}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByStatus(@PathVariable AppointmentStatus status) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByStatus(status));
     }
 
+    // для причастного мастера
     @PutMapping("/{id}")
     public ResponseEntity<AppointmentDTO> replaceAppointment(@PathVariable Long id, @RequestBody Appointment newAppointment) {
         return appointmentService.replaceAppointment(id, newAppointment)
@@ -75,6 +84,7 @@ public class AppointmentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // для причастного мастера
     @PatchMapping("/{id}")
     public ResponseEntity<AppointmentDTO> updateAppointment(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return appointmentService.updateAppointment(id, updates)
@@ -82,6 +92,7 @@ public class AppointmentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // для причастного мастера
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
         appointmentService.deleteAppointment(id);

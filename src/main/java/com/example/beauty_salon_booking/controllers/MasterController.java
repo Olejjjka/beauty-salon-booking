@@ -48,9 +48,9 @@ public class MasterController {
     }
 
     // для всех клиентов и мастеров
-    @GetMapping("/{id}")
-    public ResponseEntity<MasterDTO> getMasterById(@PathVariable Long id) {
-        return masterService.getMasterById(id)
+    @GetMapping("/{masterId}")
+    public ResponseEntity<MasterDTO> getMasterById(@PathVariable Long masterId) {
+        return masterService.getMasterById(masterId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -109,25 +109,25 @@ public class MasterController {
     }
 
     // для причастного мастера
-    @PutMapping("/{id}")
-    public ResponseEntity<MasterDTO> replaceMaster(@PathVariable Long id, @RequestBody Master newMaster) {
-        return masterService.replaceMaster(id, newMaster)
+    @PutMapping("/{masterId}")
+    public ResponseEntity<MasterDTO> replaceMaster(@PathVariable Long masterId, @RequestBody Master newMaster) {
+        return masterService.replaceMaster(masterId, newMaster)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     // для причастного мастера
-    @PatchMapping("/{id}")
-    public ResponseEntity<MasterDTO> updateMaster(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        return masterService.updateMaster(id, updates)
+    @PatchMapping("/{masterId}")
+    public ResponseEntity<MasterDTO> updateMaster(@PathVariable Long masterId, @RequestBody Map<String, Object> updates) {
+        return masterService.updateMaster(masterId, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     // для причастного мастера
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMaster(@PathVariable Long id) {
-        masterService.deleteMaster(id);
+    @DeleteMapping("/{masterId}")
+    public ResponseEntity<Void> deleteMaster(@PathVariable Long masterId) {
+        masterService.deleteMaster(masterId);
         return ResponseEntity.noContent().build();
     }
 

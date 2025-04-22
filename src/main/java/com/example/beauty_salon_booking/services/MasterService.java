@@ -27,56 +27,69 @@ public class MasterService {
     private final AppointmentRepository appointmentRepository;
     private final PasswordEncoder passwordEncoder;
     private final DTOConverter dtoConverter;
+    private final AuthService authService;
 
     @Autowired
     public MasterService(MasterRepository masterRepository,
                          BeautyServiceRepository beautyServiceRepository,
                          AppointmentRepository appointmentRepository,
                          PasswordEncoder passwordEncoder,
-                         DTOConverter dtoConverter) {
+                         DTOConverter dtoConverter,
+                         AuthService authService) {
         this.masterRepository = masterRepository;
         this.beautyServiceRepository = beautyServiceRepository;
         this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.dtoConverter = dtoConverter;
+        this.authService = authService;
     }
 
+    // для всех клиентов и мастеров
     public List<MasterDTO> getAllMasters() {
         return masterRepository.findAll().stream()
                 .map(dtoConverter::convertToMasterDTO)
                 .toList();
     }
 
-    public Optional<MasterDTO> getMasterById(Long id) {
-        return masterRepository.findById(id).map(dtoConverter::convertToMasterDTO);
+    // для всех клиентов и мастеров
+    public Optional<MasterDTO> getMasterById(Long masterId) {
+        return masterRepository.findById(masterId).map(dtoConverter::convertToMasterDTO);
     }
 
+    // для всех клиентов и мастеров
     public Optional<MasterDTO> getMasterByName(String name) {
         return masterRepository.findByName(name).map(dtoConverter::convertToMasterDTO);
     }
 
+    // не надо
     public Optional<MasterDTO> getMasterByPhone(String phone) {
         return masterRepository.findByPhone(phone).map(dtoConverter::convertToMasterDTO);
     }
 
+    // не надо
     public Optional<MasterDTO> getMasterByLogin(String login) {
         return masterRepository.findByLogin(login).map(dtoConverter::convertToMasterDTO);
     }
 
+    // без ограничений
     @Transactional
     public MasterDTO saveMaster(Master master) {
         master.setPassword(passwordEncoder.encode(master.getPassword()));
         return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 
+    // для причастного мастера
     @Transactional
-    public void deleteMaster(Long id) {
-        masterRepository.deleteById(id);
+    public void deleteMaster(Long masterId) {
+        authService.checkAccessToMaster(masterId);
+        masterRepository.deleteById(masterId);
     }
 
+    // для причастного мастера
     @Transactional
-    public Optional<MasterDTO> replaceMaster(Long id, Master newMaster) {
-        return masterRepository.findById(id).map(existingMaster -> {
+    public Optional<MasterDTO> replaceMaster(Long masterId, Master newMaster) {
+        authService.checkAccessToMaster(masterId);
+        return masterRepository.findById(masterId).map(existingMaster -> {
             existingMaster.setName(newMaster.getName());
             existingMaster.setPhone(newMaster.getPhone());
             existingMaster.setLogin(newMaster.getLogin());
@@ -85,9 +98,11 @@ public class MasterService {
         });
     }
 
+    // для причастного мастера
     @Transactional
-    public Optional<MasterDTO> updateMaster(Long id, Map<String, Object> updates) {
-        return masterRepository.findById(id).map(existingMaster -> {
+    public Optional<MasterDTO> updateMaster(Long masterId, Map<String, Object> updates) {
+        authService.checkAccessToMaster(masterId);
+        return masterRepository.findById(masterId).map(existingMaster -> {
             if (updates.containsKey("name")) {
                 existingMaster.setName((String) updates.get("name"));
             }
@@ -104,6 +119,7 @@ public class MasterService {
         });
     }
 
+    // для всех клиентов и мастеров
     public List<BeautyServiceDTO> getBeautyServicesByMasterId(Long masterId) {
         return masterRepository.findById(masterId)
                 .map(master -> master.getBeautyServices().stream()
@@ -113,14 +129,18 @@ public class MasterService {
                 .orElse(Collections.emptyList());
     }
 
+    // для причастного мастера
     public List<AppointmentDTO> getAppointmentsByMasterId(Long masterId) {
+        authService.checkAccessToMaster(masterId);
         return appointmentRepository.findByMasterId(masterId).stream()
                 .map(dtoConverter::convertToAppointmentDTO)
                 .toList();
     }
 
+    // для причастного мастера
     @Transactional
     public MasterDTO addBeautyServiceToMaster(Long masterId, Long beautyServiceId) {
+        authService.checkAccessToMaster(masterId);
         Master master = masterRepository.findById(masterId)
                 .orElseThrow(() -> new EntityNotFoundException("Master not found"));
         BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId)
@@ -130,8 +150,10 @@ public class MasterService {
         return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 
+    // для причастного мастера
     @Transactional
     public MasterDTO removeBeautyServiceFromMaster(Long masterId, Long beautyServiceId) {
+        authService.checkAccessToMaster(masterId);
         Master master = masterRepository.findById(masterId).
                 orElseThrow(() -> new EntityNotFoundException("Master not found"));
         BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId).
@@ -185,6 +207,7 @@ public class MasterService {
         return availableTimeSlots;
     }
 
+    // для всех клиентов и мастеров
     public Map<LocalDate, List<AvailableTimeSlotDTO>> getAvailableTimeSlots(Long masterId, LocalDate startDate, LocalDate endDate) {
         Map<LocalDate, List<AvailableTimeSlotDTO>> availableSlotsByDate = new LinkedHashMap<>();
 

@@ -38,9 +38,9 @@ public class ClientController {
     }
 
     // для причастных клиента и мастера
-    @GetMapping("/{id}")
-    public ResponseEntity<ClientDTO> getClientById(@PathVariable Long id) {
-        return clientService.getClientById(id)
+    @GetMapping("/{clientId}")
+    public ResponseEntity<ClientDTO> getClientById(@PathVariable Long clientId) {
+        return clientService.getClientById(clientId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -62,9 +62,9 @@ public class ClientController {
     }
 
     // для причастного клиента
-    @GetMapping("/{id}/appointments")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByClientId(@PathVariable Long id) {
-        List<AppointmentDTO> appointments = clientService.getAppointmentsByClientId(id);
+    @GetMapping("/{clientId}/appointments")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByClientId(@PathVariable Long clientId) {
+        List<AppointmentDTO> appointments = clientService.getAppointmentsByClientId(clientId);
         if (appointments.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -72,25 +72,25 @@ public class ClientController {
     }
 
     // для причастного клиента
-    @PutMapping("/{id}")
-    public ResponseEntity<ClientDTO> replaceClient(@PathVariable Long id, @RequestBody Client newClient) {
-        return clientService.replaceClient(id, newClient)
+    @PutMapping("/{clientId}")
+    public ResponseEntity<ClientDTO> replaceClient(@PathVariable Long clientId, @RequestBody Client newClient) {
+        return clientService.replaceClient(clientId, newClient)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     // для причастного клиента
-    @PatchMapping("/{id}")
-    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        return clientService.updateClient(id, updates)
+    @PatchMapping("/{clientId}")
+    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long clientId, @RequestBody Map<String, Object> updates) {
+        return clientService.updateClient(clientId, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     // для причастного клиента
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
-        clientService.deleteClient(id);
+    @DeleteMapping("/{clientId}")
+    public ResponseEntity<Void> deleteClient(@PathVariable Long clientId) {
+        clientService.deleteClient(clientId);
         return ResponseEntity.noContent().build();
     }
 }

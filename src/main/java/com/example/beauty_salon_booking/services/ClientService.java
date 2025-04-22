@@ -25,15 +25,18 @@ public class ClientService {
     private final AppointmentRepository appointmentRepository;
     private final PasswordEncoder passwordEncoder;
     private final DTOConverter dtoConverter;
+    private final AuthService authService;
 
     public ClientService(ClientRepository clientRepository,
                          AppointmentRepository appointmentRepository,
                          PasswordEncoder passwordEncoder,
-                         DTOConverter dtoConverter) {
+                         DTOConverter dtoConverter,
+                         AuthService authService) {
         this.clientRepository = clientRepository;
         this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.dtoConverter = dtoConverter;
+        this.authService = authService;
     }
 
     // не нужен (можно удалить)
@@ -44,14 +47,11 @@ public class ClientService {
     }
 
     // для причастных клиента и мастера
-    public Optional<ClientDTO> getClientById(Long id) {
-        UserPrincipal user = getCurrentUser();
-
-        if (user.getRole() == Role.CLIENT && !user.getId().equals(id)) {
-            throw new AccessDeniedException("Вы можете просматривать только свою информацию.");
+    public Optional<ClientDTO> getClientById(Long clientId) {
+        if (!authService.isCurrentUserMaster()) {
+            authService.checkAccessToClient(clientId);
         }
-
-        return clientRepository.findById(id).map(dtoConverter::convertToClientDTO);
+        return clientRepository.findById(clientId).map(dtoConverter::convertToClientDTO);
     }
 
     // не нужен (можно удалить)
@@ -66,7 +66,7 @@ public class ClientService {
 
     // для причастного клиента
     public List<AppointmentDTO> getAppointmentsByClientId(Long clientId) {
-        checkClientAccess(clientId);
+        authService.checkAccessToClient(clientId);
         return appointmentRepository.findByClientId(clientId).stream()
                 .map(dtoConverter::convertToAppointmentDTO)
                 .toList();
@@ -81,16 +81,16 @@ public class ClientService {
 
     // для причастного клиента
     @Transactional
-    public void deleteClient(Long id) {
-        checkClientAccess(id);
-        clientRepository.deleteById(id);
+    public void deleteClient(Long clientId) {
+        authService.checkAccessToClient(clientId);
+        clientRepository.deleteById(clientId);
     }
 
     // для причастного клиента
     @Transactional
-    public Optional<ClientDTO> replaceClient(Long id, Client newClient) {
-        checkClientAccess(id);
-        return clientRepository.findById(id).map(existingClient -> {
+    public Optional<ClientDTO> replaceClient(Long clientId, Client newClient) {
+        authService.checkAccessToClient(clientId);
+        return clientRepository.findById(clientId).map(existingClient -> {
             existingClient.setName(newClient.getName());
             existingClient.setPhone(newClient.getPhone());
             existingClient.setLogin(newClient.getLogin());
@@ -101,9 +101,9 @@ public class ClientService {
 
     // для причастного клиента
     @Transactional
-    public Optional<ClientDTO> updateClient(Long id, Map<String, Object> updates) {
-        checkClientAccess(id);
-        return clientRepository.findById(id).map(existingClient -> {
+    public Optional<ClientDTO> updateClient(Long clientId, Map<String, Object> updates) {
+        authService.checkAccessToClient(clientId);
+        return clientRepository.findById(clientId).map(existingClient -> {
             if (updates.containsKey("name")) {
                 existingClient.setName((String) updates.get("name"));
             }
@@ -121,9 +121,10 @@ public class ClientService {
     }
 
     // Универсальный метод проверки: "а ты вообще этот клиент?"
-    private void checkClientAccess(Long id) {
+    // Удалить
+    private void checkClientAccess(Long clientId) {
         UserPrincipal user = getCurrentUser();
-        if (user.getRole() != Role.CLIENT || !user.getId().equals(id)) {
+        if (user.getRole() != Role.CLIENT || !user.getId().equals(clientId)) {
             throw new AccessDeniedException("Доступ запрещён.");
         }
     }

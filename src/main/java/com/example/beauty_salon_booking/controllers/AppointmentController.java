@@ -38,64 +38,64 @@ public class AppointmentController {
         return appointmentService.getAllAppointments();
     }
 
-    // для причастных клиента и мастера
-    @GetMapping("/{id}")
-    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long id) {
-        return appointmentService.getAppointmentById(id)
+    // для причастных клиента и мастера, которые связаны с конкретной записью
+    @GetMapping("/{appointmentId}")
+    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long appointmentId) {
+        return appointmentService.getAppointmentById(appointmentId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // для причастного клиента
+    // для причастного клиента, который связан с конкретной записью
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByClient(@PathVariable Long clientId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByClientId(clientId));
     }
 
-    // для причастного мастера
+    // для причастного мастера, который связан с конкретной записью
     @GetMapping("/master/{masterId}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMaster(@PathVariable Long masterId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByMasterId(masterId));
     }
 
-    // не надо
+    // для причастных клиента и мастера, которые связаны с конкретной записью
     @GetMapping("/beautyService/{beautyServiceId}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByBeautyServiceId(@PathVariable Long beautyServiceId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByBeautyServiceId(beautyServiceId));
     }
 
-    // для причастных клиента и мастера
+    // для причастных клиента и мастера, которые связаны с конкретной записью
     @GetMapping("/dateAndTime/{dateAndTime}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByDateAndTime(@PathVariable LocalDate date, LocalTime time) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByDateAndTime(date, time));
     }
 
-    // для причастных клиента и мастера
+    // для причастных клиента и мастера, которые связаны с конкретной записью
     @GetMapping("/status/{status}")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentsByStatus(@PathVariable AppointmentStatus status) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByStatus(status));
     }
 
-    // для причастного мастера
-    @PutMapping("/{id}")
-    public ResponseEntity<AppointmentDTO> replaceAppointment(@PathVariable Long id, @RequestBody Appointment newAppointment) {
-        return appointmentService.replaceAppointment(id, newAppointment)
+    // для причастного мастера, который связан с конкретной записью
+    @PutMapping("/{appointmentId}")
+    public ResponseEntity<AppointmentDTO> replaceAppointment(@PathVariable Long appointmentId, @RequestBody Appointment newAppointment) {
+        return appointmentService.replaceAppointment(appointmentId, newAppointment)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // для причастного мастера
-    @PatchMapping("/{id}")
-    public ResponseEntity<AppointmentDTO> updateAppointment(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        return appointmentService.updateAppointment(id, updates)
+    // для причастного мастера, который связан с конкретной записью
+    @PatchMapping("/{appointmentId}")
+    public ResponseEntity<AppointmentDTO> updateAppointment(@PathVariable Long appointmentId, @RequestBody Map<String, Object> updates) {
+        return appointmentService.updateAppointment(appointmentId, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // для причастного мастера
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
-        appointmentService.deleteAppointment(id);
+    // для причастного мастера, который связан с конкретной записью
+    @DeleteMapping("/{appointmentId}")
+    public ResponseEntity<Void> deleteAppointment(@PathVariable Long appointmentId) {
+        appointmentService.deleteAppointment(appointmentId);
         return ResponseEntity.noContent().build();
     }
 }

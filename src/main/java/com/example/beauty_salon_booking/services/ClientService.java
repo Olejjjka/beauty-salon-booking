@@ -4,15 +4,16 @@ import com.example.beauty_salon_booking.dto.AppointmentDTO;
 import com.example.beauty_salon_booking.dto.ClientDTO;
 import com.example.beauty_salon_booking.dto.DTOConverter;
 import com.example.beauty_salon_booking.entities.Client;
-import com.example.beauty_salon_booking.enums.Role;
 import com.example.beauty_salon_booking.repositories.AppointmentRepository;
 import com.example.beauty_salon_booking.repositories.ClientRepository;
-import com.example.beauty_salon_booking.security.UserPrincipal;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -26,17 +27,20 @@ public class ClientService {
     private final PasswordEncoder passwordEncoder;
     private final DTOConverter dtoConverter;
     private final AuthService authService;
+    private final RevokedTokenService revokedTokenService;
 
     public ClientService(ClientRepository clientRepository,
                          AppointmentRepository appointmentRepository,
                          PasswordEncoder passwordEncoder,
                          DTOConverter dtoConverter,
-                         AuthService authService) {
+                         AuthService authService,
+                         RevokedTokenService revokedTokenService) {
         this.clientRepository = clientRepository;
         this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.dtoConverter = dtoConverter;
         this.authService = authService;
+        this.revokedTokenService = revokedTokenService;
     }
 
     // не нужен (можно удалить)
@@ -46,7 +50,7 @@ public class ClientService {
                 .toList();
     }
 
-    // для причастных клиента и мастера
+    // для причастного клиента
     public Optional<ClientDTO> getClientById(Long clientId) {
         if (!authService.isCurrentUserMaster()) {
             authService.checkAccessToClient(clientId);
@@ -113,23 +117,34 @@ public class ClientService {
             if (updates.containsKey("login")) {
                 existingClient.setLogin((String) updates.get("login"));
             }
-            if (updates.containsKey("password")) {
-                existingClient.setPassword(passwordEncoder.encode((String) updates.get("password")));
-            }
             return dtoConverter.convertToClientDTO(clientRepository.save(existingClient));
         });
     }
 
-    // Универсальный метод проверки: "а ты вообще этот клиент?"
-    // Удалить
-    private void checkClientAccess(Long clientId) {
-        UserPrincipal user = getCurrentUser();
-        if (user.getRole() != Role.CLIENT || !user.getId().equals(clientId)) {
-            throw new AccessDeniedException("Доступ запрещён.");
+    // для причастного клиента
+    @Transactional
+    public void changePassword(Long clientId, String oldPassword, String newPassword) {
+        authService.checkAccessToClient(clientId);
+
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        if (!passwordEncoder.matches(oldPassword, client.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        client.setPassword(passwordEncoder.encode(newPassword));
+        clientRepository.save(client);
+
+        // Отзыв токена после смены пароля
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+                .currentRequestAttributes()).getRequest();
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            revokedTokenService.revokeToken(token);
         }
     }
 
-    private UserPrincipal getCurrentUser() {
-        return (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
 }

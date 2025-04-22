@@ -44,9 +44,9 @@ public class BeautyServiceController {
     }
 
     // для всех клиентов и мастеров
-    @GetMapping("/{id}")
-    public ResponseEntity<BeautyServiceDTO> getBeautyServiceById(@PathVariable Long id) {
-        return beautyServiceService.getBeautyServiceById(id)
+    @GetMapping("/{beautyServiceId}")
+    public ResponseEntity<BeautyServiceDTO> getBeautyServiceById(@PathVariable Long beautyServiceId) {
+        return beautyServiceService.getBeautyServiceById(beautyServiceId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -72,25 +72,25 @@ public class BeautyServiceController {
     }
 
     // для всех мастеров
-    @PutMapping("/{id}")
-    public ResponseEntity<BeautyServiceDTO> replaceBeautyService(@PathVariable Long id, @RequestBody BeautyService newBeautyService) {
-        return beautyServiceService.replaceService(id, newBeautyService)
+    @PutMapping("/{beautyServiceId}")
+    public ResponseEntity<BeautyServiceDTO> replaceBeautyService(@PathVariable Long beautyServiceId, @RequestBody BeautyService newBeautyService) {
+        return beautyServiceService.replaceBeautyService(beautyServiceId, newBeautyService)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     // для всех мастеров
-    @PatchMapping("/{id}")
-    public ResponseEntity<BeautyServiceDTO> updateBeautyService(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        return beautyServiceService.updateService(id, updates)
+    @PatchMapping("/{beautyServiceId}")
+    public ResponseEntity<BeautyServiceDTO> updateBeautyService(@PathVariable Long beautyServiceId, @RequestBody Map<String, Object> updates) {
+        return beautyServiceService.updateBeautyService(beautyServiceId, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     // для всех мастеров
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBeautyService(@PathVariable Long id) {
-        beautyServiceService.deleteBeautyService(id);
+    @DeleteMapping("/{beautyServiceId}")
+    public ResponseEntity<Void> deleteBeautyService(@PathVariable Long beautyServiceId) {
+        beautyServiceService.deleteBeautyService(beautyServiceId);
         return ResponseEntity.noContent().build();
     }
 

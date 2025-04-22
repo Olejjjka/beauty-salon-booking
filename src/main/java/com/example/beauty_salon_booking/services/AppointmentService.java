@@ -101,7 +101,10 @@ public class AppointmentService {
     // для всех клиентов
     @Transactional
     public AppointmentDTO createAppointment(Map<String, Object> payload) {
-        Long clientId = ((Number) payload.get("clientId")).longValue();
+        //Long clientId = ((Number) payload.get("clientId")).longValue();
+        Long clientId = authService.getCurrentUserId();
+        authService.checkAccessToClient(clientId);
+
         Long masterId = ((Number) payload.get("masterId")).longValue();
         Long beautyServiceId = ((Number) payload.get("beautyServiceId")).longValue();
         LocalDate date = LocalDate.parse((String) payload.get("date"));
@@ -119,7 +122,7 @@ public class AppointmentService {
         appointment.setTime(time);
         appointment.setStatus(status);
 
-        authService.checkAccessToClient(clientId);
+        //authService.checkAccessToClient(clientId);
 
         return dtoConverter.convertToAppointmentDTO(appointmentRepository.save(appointment));
     }

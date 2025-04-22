@@ -1,9 +1,10 @@
 package com.example.beauty_salon_booking.controllers;
 
 import com.example.beauty_salon_booking.dto.AppointmentDTO;
+import com.example.beauty_salon_booking.dto.ChangePasswordRequestDTO;
 import com.example.beauty_salon_booking.dto.ClientDTO;
+import com.example.beauty_salon_booking.services.RevokedTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,16 +20,12 @@ import com.example.beauty_salon_booking.services.ClientService;
 public class ClientController {
 
     private final ClientService clientService;
+    private final RevokedTokenService revokedTokenService;
 
     @Autowired
-    public ClientController(ClientService clientService) {
+    public ClientController(ClientService clientService, RevokedTokenService revokedTokenService) {
         this.clientService = clientService;
-    }
-
-    // не нужен (можно удалить)
-    @PostMapping("/register")
-    public ResponseEntity<ClientDTO> createClient(@RequestBody Client client) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(clientService.saveClient(client));
+        this.revokedTokenService = revokedTokenService;
     }
 
     // не нужен (можно удалить)
@@ -37,7 +34,7 @@ public class ClientController {
         return clientService.getAllClients();
     }
 
-    // для причастных клиента и мастера
+    // для причастного клиента
     @GetMapping("/{clientId}")
     public ResponseEntity<ClientDTO> getClientById(@PathVariable Long clientId) {
         return clientService.getClientById(clientId)
@@ -85,6 +82,16 @@ public class ClientController {
         return clientService.updateClient(clientId, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // для причастного клиента
+    @PostMapping("/{clientId}/change-password")
+    public ResponseEntity<?> changePassword(
+            @PathVariable Long clientId,
+            @RequestBody ChangePasswordRequestDTO requestDto
+    ) {
+        clientService.changePassword(clientId, requestDto.getOldPassword(), requestDto.getNewPassword());
+        return ResponseEntity.ok("Password changed successfully. Please log in again.");
     }
 
     // для причастного клиента

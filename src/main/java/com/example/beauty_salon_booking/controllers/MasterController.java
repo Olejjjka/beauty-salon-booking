@@ -1,9 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
-import com.example.beauty_salon_booking.dto.AppointmentDTO;
-import com.example.beauty_salon_booking.dto.AvailableTimeSlotDTO;
-import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
-import com.example.beauty_salon_booking.dto.MasterDTO;
+import com.example.beauty_salon_booking.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +22,6 @@ public class MasterController {
     @Autowired
     public MasterController(MasterService masterService) {
         this.masterService = masterService;
-    }
-
-    // не нужен
-    @PostMapping("/register")
-    public ResponseEntity<MasterDTO> createMaster(@RequestBody Master master) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(masterService.saveMaster(master));
     }
 
     // для причастного мастера
@@ -122,6 +113,16 @@ public class MasterController {
         return masterService.updateMaster(masterId, updates)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // для причастного мастера
+    @PostMapping("/{masterId}/change-password")
+    public ResponseEntity<?> changePassword(
+            @PathVariable Long masterId,
+            @RequestBody ChangePasswordRequestDTO requestDto
+    ) {
+        masterService.changePassword(masterId, requestDto.getOldPassword(), requestDto.getNewPassword());
+        return ResponseEntity.ok("Password changed successfully. Please log in again.");
     }
 
     // для причастного мастера

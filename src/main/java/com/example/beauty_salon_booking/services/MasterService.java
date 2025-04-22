@@ -9,9 +9,13 @@ import com.example.beauty_salon_booking.repositories.BeautyServiceRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -28,6 +32,7 @@ public class MasterService {
     private final PasswordEncoder passwordEncoder;
     private final DTOConverter dtoConverter;
     private final AuthService authService;
+    private final RevokedTokenService revokedTokenService;
 
     @Autowired
     public MasterService(MasterRepository masterRepository,
@@ -35,13 +40,15 @@ public class MasterService {
                          AppointmentRepository appointmentRepository,
                          PasswordEncoder passwordEncoder,
                          DTOConverter dtoConverter,
-                         AuthService authService) {
+                         AuthService authService,
+                         RevokedTokenService revokedTokenService) {
         this.masterRepository = masterRepository;
         this.beautyServiceRepository = beautyServiceRepository;
         this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.dtoConverter = dtoConverter;
         this.authService = authService;
+        this.revokedTokenService = revokedTokenService;
     }
 
     // для всех клиентов и мастеров
@@ -111,9 +118,6 @@ public class MasterService {
             }
             if (updates.containsKey("login")) {
                 existingMaster.setLogin((String) updates.get("login"));
-            }
-            if (updates.containsKey("password")) {
-                existingMaster.setPassword(passwordEncoder.encode((String) updates.get("password")));
             }
             return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
         });
@@ -227,5 +231,31 @@ public class MasterService {
         }
 
         return availableSlotsByDate;
+    }
+
+    // для причастного мастера
+    @Transactional
+    public void changePassword(Long masterId, String oldPassword, String newPassword) {
+        authService.checkAccessToMaster(masterId);
+
+        Master master = masterRepository.findById(masterId)
+                .orElseThrow(() -> new RuntimeException("Master not found"));
+
+        if (!passwordEncoder.matches(oldPassword, master.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        master.setPassword(passwordEncoder.encode(newPassword));
+        masterRepository.save(master);
+
+        // Отзыв токена после смены пароля
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+                .currentRequestAttributes()).getRequest();
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            revokedTokenService.revokeToken(token);
+        }
     }
 }

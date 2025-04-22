@@ -123,14 +123,14 @@ public class AuthService {
     }
 
     // Универсальная проверка доступа (мастер или клиент)
-    public boolean hasAccessToUser(String role, Long userId) {
+    public boolean hasAccessToUser(Role role, Long userId) {
         return getCurrentUser().getRole().equals(role) && getCurrentUserId().equals(userId);
     }
 
     // Проверка, является ли текущий пользователь причастным к пользователю по ID
-    public void checkAccessToUser(String role, Long userId) {
+    public void checkAccessToUser(Role role, Long userId) {
         if (!hasAccessToUser(role, userId)) {
-            throw new SecurityException("Access denied: not the authorized " + role.toLowerCase() + ".");
+            throw new SecurityException("Access denied: not the authorized " + role.toString().toLowerCase() + ".");
         }
     }
 }

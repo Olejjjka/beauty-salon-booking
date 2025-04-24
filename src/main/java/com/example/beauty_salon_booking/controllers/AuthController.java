@@ -6,7 +6,7 @@ import com.example.beauty_salon_booking.dto.TokenResponseDTO;
 import com.example.beauty_salon_booking.security.JwtTokenProvider;
 import com.example.beauty_salon_booking.services.ClientService;
 import com.example.beauty_salon_booking.services.MasterService;
-import com.example.beauty_salon_booking.services.RevokedTokenService; // Импортируем сервис отзыва токенов
+import com.example.beauty_salon_booking.services.RevokedTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

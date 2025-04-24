@@ -10,7 +10,6 @@ public class RegisterRequestDTO {
     private String name;
     private String phone;
 
-    // Конструкторы, геттеры и сеттеры
     public String getLogin() {
         return login;
     }
@@ -43,23 +42,21 @@ public class RegisterRequestDTO {
         this.phone = phone;
     }
 
-    // Преобразование DTO в Client
     public Client toClient() {
         Client client = new Client();
         client.setLogin(this.login);
         client.setPassword(this.password);
-        client.setName(this.name);  // Устанавливаем name
-        client.setPhone(this.phone);  // Устанавливаем phone
+        client.setName(this.name);
+        client.setPhone(this.phone);
         return client;
     }
 
-    // Преобразование DTO в Master
     public Master toMaster() {
         Master master = new Master();
         master.setLogin(this.login);
         master.setPassword(this.password);
-        master.setName(this.name);  // Устанавливаем name
-        master.setPhone(this.phone);  // Устанавливаем phone
+        master.setName(this.name);
+        master.setPhone(this.phone);
         return master;
     }
 }

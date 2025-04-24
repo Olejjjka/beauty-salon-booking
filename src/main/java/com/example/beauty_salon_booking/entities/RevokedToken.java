@@ -14,16 +14,13 @@ public class RevokedToken {
     @Column(name = "revoked_at", nullable = false)
     private LocalDateTime revokedAt;
 
-    // Конструктор по умолчанию (обязателен для JPA)
     public RevokedToken() {}
 
-    // Конструктор с параметрами
     public RevokedToken(String token, LocalDateTime revokedAt) {
         this.token = token;
         this.revokedAt = revokedAt;
     }
 
-    // Геттеры и сеттеры
     public String getToken() {
         return token;
     }

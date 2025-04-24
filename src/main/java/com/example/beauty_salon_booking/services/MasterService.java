@@ -9,9 +9,13 @@ import com.example.beauty_salon_booking.repositories.BeautyServiceRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -27,83 +31,51 @@ public class MasterService {
     private final AppointmentRepository appointmentRepository;
     private final PasswordEncoder passwordEncoder;
     private final DTOConverter dtoConverter;
+    private final AuthService authService;
+    private final RevokedTokenService revokedTokenService;
 
     @Autowired
     public MasterService(MasterRepository masterRepository,
                          BeautyServiceRepository beautyServiceRepository,
                          AppointmentRepository appointmentRepository,
                          PasswordEncoder passwordEncoder,
-                         DTOConverter dtoConverter) {
+                         DTOConverter dtoConverter,
+                         AuthService authService,
+                         RevokedTokenService revokedTokenService) {
         this.masterRepository = masterRepository;
         this.beautyServiceRepository = beautyServiceRepository;
         this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.dtoConverter = dtoConverter;
+        this.authService = authService;
+        this.revokedTokenService = revokedTokenService;
     }
 
-    public List<MasterDTO> getAllMasters() {
-        return masterRepository.findAll().stream()
-                .map(dtoConverter::convertToMasterDTO)
-                .toList();
-    }
-
-    public Optional<MasterDTO> getMasterById(Long id) {
-        return masterRepository.findById(id).map(dtoConverter::convertToMasterDTO);
-    }
-
-    public Optional<MasterDTO> getMasterByName(String name) {
-        return masterRepository.findByName(name).map(dtoConverter::convertToMasterDTO);
-    }
-
-    public Optional<MasterDTO> getMasterByPhone(String phone) {
-        return masterRepository.findByPhone(phone).map(dtoConverter::convertToMasterDTO);
-    }
-
-    public Optional<MasterDTO> getMasterByLogin(String login) {
-        return masterRepository.findByLogin(login).map(dtoConverter::convertToMasterDTO);
-    }
-
+    // без ограничений
     @Transactional
     public MasterDTO saveMaster(Master master) {
         master.setPassword(passwordEncoder.encode(master.getPassword()));
         return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 
-    @Transactional
-    public void deleteMaster(Long id) {
-        masterRepository.deleteById(id);
+    // для всех клиентов и мастеров
+    public List<MasterDTO> getAllMasters() {
+        return masterRepository.findAll().stream()
+                .map(dtoConverter::convertToMasterDTO)
+                .toList();
     }
 
-    @Transactional
-    public Optional<MasterDTO> replaceMaster(Long id, Master newMaster) {
-        return masterRepository.findById(id).map(existingMaster -> {
-            existingMaster.setName(newMaster.getName());
-            existingMaster.setPhone(newMaster.getPhone());
-            existingMaster.setLogin(newMaster.getLogin());
-            existingMaster.setPassword(newMaster.getPassword());
-            return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
-        });
+    // для всех клиентов и мастеров
+    public Optional<MasterDTO> getMasterById(Long masterId) {
+        return masterRepository.findById(masterId).map(dtoConverter::convertToMasterDTO);
     }
 
-    @Transactional
-    public Optional<MasterDTO> updateMaster(Long id, Map<String, Object> updates) {
-        return masterRepository.findById(id).map(existingMaster -> {
-            if (updates.containsKey("name")) {
-                existingMaster.setName((String) updates.get("name"));
-            }
-            if (updates.containsKey("phone")) {
-                existingMaster.setPhone((String) updates.get("phone"));
-            }
-            if (updates.containsKey("login")) {
-                existingMaster.setLogin((String) updates.get("login"));
-            }
-            if (updates.containsKey("password")) {
-                existingMaster.setPassword(passwordEncoder.encode((String) updates.get("password")));
-            }
-            return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
-        });
+    // для всех клиентов и мастеров
+    public Optional<MasterDTO> getMasterByName(String name) {
+        return masterRepository.findByName(name).map(dtoConverter::convertToMasterDTO);
     }
 
+    // для всех клиентов и мастеров
     public List<BeautyServiceDTO> getBeautyServicesByMasterId(Long masterId) {
         return masterRepository.findById(masterId)
                 .map(master -> master.getBeautyServices().stream()
@@ -113,34 +85,27 @@ public class MasterService {
                 .orElse(Collections.emptyList());
     }
 
-    public List<AppointmentDTO> getAppointmentsByMasterId(Long masterId) {
-        return appointmentRepository.findByMasterId(masterId).stream()
-                .map(dtoConverter::convertToAppointmentDTO)
-                .toList();
+    // для всех клиентов и мастеров
+    public Map<LocalDate, List<AvailableTimeSlotDTO>> getAvailableTimeSlots(Long masterId, LocalDate startDate, LocalDate endDate) {
+        Map<LocalDate, List<AvailableTimeSlotDTO>> availableSlotsByDate = new LinkedHashMap<>();
+
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            LocalDate finalDate = currentDate;
+            List<AppointmentDTO> appointments = appointmentRepository.findByMasterId(masterId)
+                    .stream()
+                    .map(dtoConverter::convertToAppointmentDTO)
+                    .filter(appointment -> appointment.getDate().isEqual(finalDate))
+                    .collect(Collectors.toList());
+
+            List<AvailableTimeSlotDTO> availableSlots = calculateAvailableSlots(appointments);
+            availableSlotsByDate.put(currentDate, availableSlots);
+
+            currentDate = currentDate.plusDays(1);
+        }
+
+        return availableSlotsByDate;
     }
-
-    @Transactional
-    public MasterDTO addBeautyServiceToMaster(Long masterId, Long beautyServiceId) {
-        Master master = masterRepository.findById(masterId)
-                .orElseThrow(() -> new EntityNotFoundException("Master not found"));
-        BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId)
-                .orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
-
-        master.addBeautyService(beautyService);
-        return dtoConverter.convertToMasterDTO(masterRepository.save(master));
-    }
-
-    @Transactional
-    public MasterDTO removeBeautyServiceFromMaster(Long masterId, Long beautyServiceId) {
-        Master master = masterRepository.findById(masterId).
-                orElseThrow(() -> new EntityNotFoundException("Master not found"));
-        BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId).
-                orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
-
-        master.removeBeautyService(beautyService);
-        return dtoConverter.convertToMasterDTO(masterRepository.save(master));
-    }
-
     private List<AvailableTimeSlotDTO> calculateAvailableSlots(List<AppointmentDTO> appointments) {
         LocalTime startOfDay = LocalTime.of(9, 0);
         LocalTime endOfDay = LocalTime.of(19, 0);
@@ -185,24 +150,113 @@ public class MasterService {
         return availableTimeSlots;
     }
 
-    public Map<LocalDate, List<AvailableTimeSlotDTO>> getAvailableTimeSlots(Long masterId, LocalDate startDate, LocalDate endDate) {
-        Map<LocalDate, List<AvailableTimeSlotDTO>> availableSlotsByDate = new LinkedHashMap<>();
+    // для причастного мастера
+    public List<AppointmentDTO> getAppointmentsByMasterId(Long masterId) {
+        authService.checkAccessToMaster(masterId);
+        return appointmentRepository.findByMasterId(masterId).stream()
+                .map(dtoConverter::convertToAppointmentDTO)
+                .toList();
+    }
 
-        LocalDate currentDate = startDate;
-        while (!currentDate.isAfter(endDate)) {
-            LocalDate finalDate = currentDate;
-            List<AppointmentDTO> appointments = appointmentRepository.findByMasterId(masterId)
-                    .stream()
-                    .map(dtoConverter::convertToAppointmentDTO)
-                    .filter(appointment -> appointment.getDate().isEqual(finalDate))
-                    .collect(Collectors.toList());
+    // для причастного мастера
+    @Transactional
+    public MasterDTO addBeautyServiceToMaster(Long masterId, Long beautyServiceId) {
+        authService.checkAccessToMaster(masterId);
+        Master master = masterRepository.findById(masterId)
+                .orElseThrow(() -> new EntityNotFoundException("Master not found"));
+        BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId)
+                .orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
 
-            List<AvailableTimeSlotDTO> availableSlots = calculateAvailableSlots(appointments);
-            availableSlotsByDate.put(currentDate, availableSlots);
+        master.addBeautyService(beautyService);
+        return dtoConverter.convertToMasterDTO(masterRepository.save(master));
+    }
 
-            currentDate = currentDate.plusDays(1);
+    // для причастного мастера
+    @Transactional
+    public MasterDTO removeBeautyServiceFromMaster(Long masterId, Long beautyServiceId) {
+        authService.checkAccessToMaster(masterId);
+        Master master = masterRepository.findById(masterId).
+                orElseThrow(() -> new EntityNotFoundException("Master not found"));
+        BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId).
+                orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
+
+        master.removeBeautyService(beautyService);
+        return dtoConverter.convertToMasterDTO(masterRepository.save(master));
+    }
+
+    // для причастного мастера
+    @Transactional
+    public Optional<MasterDTO> replaceMaster(Long masterId, Master newMaster) {
+        authService.checkAccessToMaster(masterId);
+        return masterRepository.findById(masterId).map(existingMaster -> {
+            existingMaster.setName(newMaster.getName());
+            existingMaster.setPhone(newMaster.getPhone());
+            existingMaster.setLogin(newMaster.getLogin());
+            existingMaster.setPassword(newMaster.getPassword());
+            return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
+        });
+    }
+
+    // для причастного мастера
+    @Transactional
+    public Optional<MasterDTO> updateMaster(Long masterId, Map<String, Object> updates) {
+        authService.checkAccessToMaster(masterId);
+        return masterRepository.findById(masterId).map(existingMaster -> {
+            if (updates.containsKey("name")) {
+                existingMaster.setName((String) updates.get("name"));
+            }
+            if (updates.containsKey("phone")) {
+                existingMaster.setPhone((String) updates.get("phone"));
+            }
+            if (updates.containsKey("login")) {
+                existingMaster.setLogin((String) updates.get("login"));
+            }
+            return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
+        });
+    }
+
+    // для причастного мастера
+    @Transactional
+    public void changePassword(Long masterId, String oldPassword, String newPassword) {
+        authService.checkAccessToMaster(masterId);
+
+        Master master = masterRepository.findById(masterId)
+                .orElseThrow(() -> new RuntimeException("Master not found"));
+
+        if (!passwordEncoder.matches(oldPassword, master.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
         }
 
-        return availableSlotsByDate;
+        master.setPassword(passwordEncoder.encode(newPassword));
+        masterRepository.save(master);
+
+        // Отзыв токена после смены пароля
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+                .currentRequestAttributes()).getRequest();
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            revokedTokenService.revokeToken(token);
+        }
+    }
+
+    // для причастного мастера
+    @Transactional
+    public void deleteMaster(Long masterId) {
+        authService.checkAccessToMaster(masterId);
+        masterRepository.deleteById(masterId);
+    }
+
+
+
+    // не надо
+    public Optional<MasterDTO> getMasterByPhone(String phone) {
+        return masterRepository.findByPhone(phone).map(dtoConverter::convertToMasterDTO);
+    }
+
+    // не надо
+    public Optional<MasterDTO> getMasterByLogin(String login) {
+        return masterRepository.findByLogin(login).map(dtoConverter::convertToMasterDTO);
     }
 }

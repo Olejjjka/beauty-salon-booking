@@ -57,7 +57,7 @@ public class AppointmentService {
     public Optional<ClientDTO> getClientByAppointmentId(Long appointmentId) {
         return appointmentRepository.findById(appointmentId)
                 .map(appointment -> {
-                    authService.checkAccessFromUserToAppointment(appointment); // проверка доступа
+                    authService.checkAccessFromUserToAppointment(appointment); // Проверка доступа
                     return dtoConverter.convertToClientDTO(appointment.getClient());
                 });
     }
@@ -66,7 +66,7 @@ public class AppointmentService {
     public Optional<MasterDTO> getMasterByAppointmentId(Long appointmentId) {
         return appointmentRepository.findById(appointmentId)
                 .map(appointment -> {
-                    authService.checkAccessFromUserToAppointment(appointment);
+                    authService.checkAccessFromUserToAppointment(appointment); // Проверка доступа
                     return dtoConverter.convertToMasterDTO(appointment.getMaster());
                 });
     }
@@ -134,6 +134,7 @@ public class AppointmentService {
         appointment.setDate(newAppointment.getDate());
         appointment.setTime(newAppointment.getTime());
         appointment.setStatus(newAppointment.getStatus());
+
         return Optional.of(dtoConverter.convertToAppointmentDTO(appointmentRepository.save(appointment)));
     }
 

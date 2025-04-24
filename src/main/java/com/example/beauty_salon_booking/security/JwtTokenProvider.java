@@ -14,7 +14,10 @@ import java.util.*;
 @Component
 public class JwtTokenProvider {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    byte[] SECRET = "1QxkT8o6Bz1gRGylRG3C/qhdL8FvjgIE3wJ3nSC9E2vO7aCZXtkxN03RJ1rU2kYUbA6UQ9e7T4XT8zJghPIuBA==".getBytes(); // Секретный ключ
+    private final Key key = Keys.hmacShaKeyFor(SECRET);
+
+
     private final long JWT_EXPIRATION = 86400000; // 1 день
 
     // Генерация токена
@@ -66,8 +69,8 @@ public class JwtTokenProvider {
 
         return new UsernamePasswordAuthenticationToken(userPrincipal, "", authorities);
     }
-
-    // Получить логин (login) из токена
+    
+    // Получить логин из токена
     public String getLoginFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(key)

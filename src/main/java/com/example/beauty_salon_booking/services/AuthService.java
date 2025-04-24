@@ -51,6 +51,7 @@ public class AuthService {
         return Role.MASTER.equals(getCurrentUser().getRole());
     }
 
+    // Проверка причастности
     private boolean isUserRelatedToAppointment(Appointment appointment) {
         Long currentUserId = getCurrentUserId();
         return (isCurrentUserClient() && appointment.getClient().getId().equals(currentUserId)) ||
@@ -65,6 +66,53 @@ public class AuthService {
     private boolean isMasterRelatedToAppointment(Appointment appointment) {
         Long currentUserId = getCurrentUserId();
         return (isCurrentUserMaster() && appointment.getMaster().getId().equals(currentUserId));
+    }
+
+    // Проверка доступа к данным клиента
+    public void checkAccessToClient(Long clientId) {
+        if (!isCurrentUserClient() || !getCurrentUserId().equals(clientId)) {
+            throw new SecurityException("Access denied: not the authorized client.");
+        }
+    }
+
+    // Проверка доступа к данным мастера
+    public void checkAccessToMaster(Long masterId) {
+        if (!isCurrentUserMaster() || !getCurrentUserId().equals(masterId)) {
+            throw new SecurityException("Access denied: not the authorized master.");
+        }
+    }
+
+    // Проверка причастности
+    public void checkAccessFromUserToAppointment(Appointment appointment) {
+        if (!isUserRelatedToAppointment(appointment)) {
+            throw new SecurityException("Access denied: not related to this appointment.");
+        }
+    }
+
+    public void checkAccessFromClientToAppointment(Appointment appointment) {
+        if (!isClientRelatedToAppointment(appointment)) {
+            throw new SecurityException("Access denied: not related to this appointment.");
+        }
+    }
+
+    public void checkAccessFromMasterToAppointment(Appointment appointment) {
+        if (!isMasterRelatedToAppointment(appointment)) {
+            throw new SecurityException("Access denied: not related to this appointment.");
+        }
+    }
+
+
+
+    // Универсальная проверка доступа (мастер или клиент)
+    public boolean hasAccessToUser(Role role, Long userId) {
+        return getCurrentUser().getRole().equals(role) && getCurrentUserId().equals(userId);
+    }
+
+    // Проверка, является ли текущий пользователь причастным к пользователю по ID
+    public void checkAccessToUser(Role role, Long userId) {
+        if (!hasAccessToUser(role, userId)) {
+            throw new SecurityException("Access denied: not the authorized " + role.toString().toLowerCase() + ".");
+        }
     }
 
     // Получение текущего клиента
@@ -85,52 +133,9 @@ public class AuthService {
                 .orElseThrow(() -> new EntityNotFoundException("Master not found"));
     }
 
+    // Получение текущей записи
     public Appointment getCurrentAppointment(Long appointmentId) {
         return appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment not found"));
-    }
-
-    // Проверка доступа к данным клиента
-    public void checkAccessToClient(Long clientId) {
-        if (!isCurrentUserClient() || !getCurrentUserId().equals(clientId)) {
-            throw new SecurityException("Access denied: not the authorized client.");
-        }
-    }
-
-    // Проверка доступа к данным мастера
-    public void checkAccessToMaster(Long masterId) {
-        if (!isCurrentUserMaster() || !getCurrentUserId().equals(masterId)) {
-            throw new SecurityException("Access denied: not the authorized master.");
-        }
-    }
-
-    public void checkAccessFromUserToAppointment(Appointment appointment) {
-        if (!isUserRelatedToAppointment(appointment)) {
-            throw new SecurityException("Access denied: not related to this appointment.");
-        }
-    }
-
-    public void checkAccessFromClientToAppointment(Appointment appointment) {
-        if (!isClientRelatedToAppointment(appointment)) {
-            throw new SecurityException("Access denied: not related to this appointment.");
-        }
-    }
-
-    public void checkAccessFromMasterToAppointment(Appointment appointment) {
-        if (!isMasterRelatedToAppointment(appointment)) {
-            throw new SecurityException("Access denied: not related to this appointment.");
-        }
-    }
-
-    // Универсальная проверка доступа (мастер или клиент)
-    public boolean hasAccessToUser(Role role, Long userId) {
-        return getCurrentUser().getRole().equals(role) && getCurrentUserId().equals(userId);
-    }
-
-    // Проверка, является ли текущий пользователь причастным к пользователю по ID
-    public void checkAccessToUser(Role role, Long userId) {
-        if (!hasAccessToUser(role, userId)) {
-            throw new SecurityException("Access denied: not the authorized " + role.toString().toLowerCase() + ".");
-        }
     }
 }

@@ -1,7 +1,9 @@
 package com.example.beauty_salon_booking.services;
 
 import com.example.beauty_salon_booking.dto.AppointmentDTO;
+import com.example.beauty_salon_booking.dto.ClientDTO;
 import com.example.beauty_salon_booking.dto.DTOConverter;
+import com.example.beauty_salon_booking.dto.MasterDTO;
 import com.example.beauty_salon_booking.entities.Appointment;
 import com.example.beauty_salon_booking.enums.AppointmentStatus;
 import com.example.beauty_salon_booking.repositories.AppointmentRepository;
@@ -42,13 +44,6 @@ public class AppointmentService {
         this.authService = authService;
     }
 
-    // не надо
-    public List<AppointmentDTO> getAllAppointments() {
-        return appointmentRepository.findAll().stream()
-                .map(dtoConverter::convertToAppointmentDTO)
-                .toList();
-    }
-
     // для причастных клиента и мастера, которые связаны с конкретной записью
     public Optional<AppointmentDTO> getAppointmentById(Long appointmentId) {
         return appointmentRepository.findById(appointmentId)
@@ -58,20 +53,22 @@ public class AppointmentService {
                 });
     }
 
-    // для причастного клиента, который связан с конкретной записью
-    public List<AppointmentDTO> getAppointmentsByClientId(Long clientId) {
-        return appointmentRepository.findByClientId(clientId).stream()
-                .peek(authService::checkAccessFromClientToAppointment) // Проверка доступа для каждого объекта
-                .map(dtoConverter::convertToAppointmentDTO)
-                .toList();
+    // для причастных клиента и мастера, которые связаны с конкретной записью
+    public Optional<ClientDTO> getClientByAppointmentId(Long appointmentId) {
+        return appointmentRepository.findById(appointmentId)
+                .map(appointment -> {
+                    authService.checkAccessFromUserToAppointment(appointment); // проверка доступа
+                    return dtoConverter.convertToClientDTO(appointment.getClient());
+                });
     }
 
-    // для причастного мастера, который связан с конкретной записью
-    public List<AppointmentDTO> getAppointmentsByMasterId(Long masterId) {
-        return appointmentRepository.findByMasterId(masterId).stream()
-                .peek(authService::checkAccessFromMasterToAppointment) // Проверка доступа для каждого объекта
-                .map(dtoConverter::convertToAppointmentDTO)
-                .toList();
+    // для причастных клиента и мастера, которые связаны с конкретной записью
+    public Optional<MasterDTO> getMasterByAppointmentId(Long appointmentId) {
+        return appointmentRepository.findById(appointmentId)
+                .map(appointment -> {
+                    authService.checkAccessFromUserToAppointment(appointment);
+                    return dtoConverter.convertToMasterDTO(appointment.getMaster());
+                });
     }
 
     // для причастных клиента и мастера, которые связаны с конкретной записью
@@ -101,7 +98,6 @@ public class AppointmentService {
     // для всех клиентов
     @Transactional
     public AppointmentDTO createAppointment(Map<String, Object> payload) {
-        //Long clientId = ((Number) payload.get("clientId")).longValue();
         Long clientId = authService.getCurrentUserId();
         authService.checkAccessToClient(clientId);
 
@@ -122,24 +118,7 @@ public class AppointmentService {
         appointment.setTime(time);
         appointment.setStatus(status);
 
-        //authService.checkAccessToClient(clientId);
-
         return dtoConverter.convertToAppointmentDTO(appointmentRepository.save(appointment));
-    }
-
-    // не надо
-    @Transactional
-    public AppointmentDTO saveAppointment(Appointment appointment) {
-        return dtoConverter.convertToAppointmentDTO(appointmentRepository.save(appointment));
-    }
-
-    // для причастного мастера, который связан с конкретной записью
-    @Transactional
-    public void deleteAppointment(Long appointmentId) {
-        Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
-        authService.checkAccessFromMasterToAppointment(appointment);
-        appointmentRepository.deleteById(appointmentId);
     }
 
     // для причастного мастера, который связан с конкретной записью
@@ -187,5 +166,45 @@ public class AppointmentService {
             appointment.setStatus(AppointmentStatus.valueOf((String) updates.get("status")));
         }
         return Optional.of(dtoConverter.convertToAppointmentDTO(appointmentRepository.save(appointment)));
+    }
+
+    // для причастного мастера, который связан с конкретной записью
+    @Transactional
+    public void deleteAppointment(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+        authService.checkAccessFromMasterToAppointment(appointment);
+        appointmentRepository.deleteById(appointmentId);
+    }
+
+
+
+    // не надо (для причастного клиента, который связан с конкретной записью)
+    public List<AppointmentDTO> getAppointmentsByClientId(Long clientId) {
+        return appointmentRepository.findByClientId(clientId).stream()
+                .peek(authService::checkAccessFromClientToAppointment) // Проверка доступа для каждого объекта
+                .map(dtoConverter::convertToAppointmentDTO)
+                .toList();
+    }
+
+    // не надо (для причастного мастера, который связан с конкретной записью)
+    public List<AppointmentDTO> getAppointmentsByMasterId(Long masterId) {
+        return appointmentRepository.findByMasterId(masterId).stream()
+                .peek(authService::checkAccessFromMasterToAppointment) // Проверка доступа для каждого объекта
+                .map(dtoConverter::convertToAppointmentDTO)
+                .toList();
+    }
+
+    // не надо
+    public List<AppointmentDTO> getAllAppointments() {
+        return appointmentRepository.findAll().stream()
+                .map(dtoConverter::convertToAppointmentDTO)
+                .toList();
+    }
+
+    // не надо
+    @Transactional
+    public AppointmentDTO saveAppointment(Appointment appointment) {
+        return dtoConverter.convertToAppointmentDTO(appointmentRepository.save(appointment));
     }
 }

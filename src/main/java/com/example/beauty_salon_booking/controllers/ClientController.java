@@ -28,32 +28,10 @@ public class ClientController {
         this.revokedTokenService = revokedTokenService;
     }
 
-    // не нужен (можно удалить)
-    @GetMapping
-    public List<ClientDTO> getAllClients() {
-        return clientService.getAllClients();
-    }
-
     // для причастного клиента
     @GetMapping("/{clientId}")
     public ResponseEntity<ClientDTO> getClientById(@PathVariable Long clientId) {
         return clientService.getClientById(clientId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // не нужен (можно удалить)
-    @GetMapping("/by-phone/{phone}")
-    public ResponseEntity<ClientDTO> getClientByPhone(@PathVariable String phone) {
-        return clientService.getClientByPhone(phone)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // не нужен (можно удалить)
-    @GetMapping("/by-login/{login}")
-    public ResponseEntity<ClientDTO> getClientByLogin(@PathVariable String login) {
-        return clientService.getClientByLogin(login)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -99,5 +77,29 @@ public class ClientController {
     public ResponseEntity<Void> deleteClient(@PathVariable Long clientId) {
         clientService.deleteClient(clientId);
         return ResponseEntity.noContent().build();
+    }
+
+
+
+    // не нужен (можно удалить)
+    @GetMapping
+    public List<ClientDTO> getAllClients() {
+        return clientService.getAllClients();
+    }
+
+    // не нужен (можно удалить)
+    @GetMapping("/by-phone")
+    public ResponseEntity<ClientDTO> getClientByPhone(@RequestParam String phone) {
+        return clientService.getClientByPhone(phone)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // не нужен (можно удалить)
+    @GetMapping("/by-login")
+    public ResponseEntity<ClientDTO> getClientByLogin(@RequestParam String login) {
+        return clientService.getClientByLogin(login)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

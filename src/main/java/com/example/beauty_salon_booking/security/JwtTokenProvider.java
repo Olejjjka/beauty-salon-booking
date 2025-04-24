@@ -24,8 +24,8 @@ public class JwtTokenProvider {
         String role = userPrincipal.getRole().name();
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())               // login
-                .claim("id", userPrincipal.getId())                    // добавляем id
+                .setSubject(userPrincipal.getUsername())                  // login
+                .claim("id", userPrincipal.getId())                    // id
                 .claim("role", role)                                   // роль
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
@@ -54,8 +54,8 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
-        Long id = claims.get("id", Integer.class).longValue();       // или Long.class, если в токене как long
-        String login = claims.getSubject();                          // login
+        Long id = claims.get("id", Integer.class).longValue();
+        String login = claims.getSubject();
         String roleStr = claims.get("role", String.class);
         Role role = Role.valueOf(roleStr);
 

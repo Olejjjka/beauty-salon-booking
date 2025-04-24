@@ -24,14 +24,6 @@ public class MasterController {
         this.masterService = masterService;
     }
 
-    // для причастного мастера
-    @PostMapping("/{masterId}/beauty-services/{beautyServiceId}")
-    public ResponseEntity<MasterDTO> addBeautyServiceToMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
-        MasterDTO masterDTO = masterService.addBeautyServiceToMaster(masterId, beautyServiceId);
-        return ResponseEntity.ok(masterDTO);
-    }
-
-
     // для всех клиентов и мастеров
     @GetMapping
     public List<MasterDTO> getAllMasters() {
@@ -47,25 +39,9 @@ public class MasterController {
     }
 
     // для всех клиентов и мастеров
-    @GetMapping("/by-name/{name}")
-    public ResponseEntity<MasterDTO> getMasterByName(@PathVariable String name) {
+    @GetMapping("/by-name")
+    public ResponseEntity<MasterDTO> getMasterByName(@RequestParam String name) {
         return masterService.getMasterByName(name)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // не надо
-    @GetMapping("/by-phone/{phone}")
-    public ResponseEntity<MasterDTO> getMasterByPhone(@PathVariable String phone) {
-        return masterService.getMasterByPhone(phone)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // не надо
-    @GetMapping("/by-login/{login}")
-    public ResponseEntity<MasterDTO> getMasterByLogin(@PathVariable String login) {
-        return masterService.getMasterByLogin(login)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -74,12 +50,6 @@ public class MasterController {
     @GetMapping("/{masterId}/beauty-services")
     public ResponseEntity<List<BeautyServiceDTO>> getBeautyServicesByMasterId(@PathVariable Long masterId) {
         return ResponseEntity.ok(masterService.getBeautyServicesByMasterId(masterId));
-    }
-
-    // для причастного мастера
-    @GetMapping("/{masterId}/appointments")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMasterId(@PathVariable Long masterId) {
-        return ResponseEntity.ok(masterService.getAppointmentsByMasterId(masterId));
     }
 
     // для всех клиентов и мастеров
@@ -97,6 +67,26 @@ public class MasterController {
                 masterService.getAvailableTimeSlots(masterId, startDate, endDate);
 
         return ResponseEntity.ok(availableSlots);
+    }
+
+    // для причастного мастера
+    @GetMapping("/{masterId}/appointments")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMasterId(@PathVariable Long masterId) {
+        return ResponseEntity.ok(masterService.getAppointmentsByMasterId(masterId));
+    }
+
+    // для причастного мастера
+    @PostMapping("/{masterId}/beauty-services/{beautyServiceId}")
+    public ResponseEntity<MasterDTO> addBeautyServiceToMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
+        MasterDTO masterDTO = masterService.addBeautyServiceToMaster(masterId, beautyServiceId);
+        return ResponseEntity.ok(masterDTO);
+    }
+
+    // для причастного мастера
+    @DeleteMapping("/{masterId}/beauty-services/{beautyServiceId}")
+    public ResponseEntity<Void> removeBeautyServiceFromMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
+        masterService.removeBeautyServiceFromMaster(masterId, beautyServiceId);
+        return ResponseEntity.noContent().build();
     }
 
     // для причастного мастера
@@ -132,10 +122,21 @@ public class MasterController {
         return ResponseEntity.noContent().build();
     }
 
-    // для причастного мастера
-    @DeleteMapping("/{masterId}/beauty-services/{beautyServiceId}")
-    public ResponseEntity<Void> removeBeautyServiceFromMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
-        masterService.removeBeautyServiceFromMaster(masterId, beautyServiceId);
-        return ResponseEntity.noContent().build();
+
+
+    // не надо
+    @GetMapping("/by-phone")
+    public ResponseEntity<MasterDTO> getMasterByPhone(@RequestParam String phone) {
+        return masterService.getMasterByPhone(phone)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // не надо
+    @GetMapping("/by-login")
+    public ResponseEntity<MasterDTO> getMasterByLogin(@RequestParam String login) {
+        return masterService.getMasterByLogin(login)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

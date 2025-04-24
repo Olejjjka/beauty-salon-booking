@@ -1,6 +1,8 @@
 package com.example.beauty_salon_booking.controllers;
 
 import com.example.beauty_salon_booking.dto.AppointmentDTO;
+import com.example.beauty_salon_booking.dto.ClientDTO;
+import com.example.beauty_salon_booking.dto.MasterDTO;
 import com.example.beauty_salon_booking.enums.AppointmentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,18 +28,6 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
-    // для всех клиентов
-    @PostMapping("/create")
-    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> payload) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(payload));
-    }
-
-    // не надо
-    @GetMapping
-    public List<AppointmentDTO> getAllAppointments() {
-        return appointmentService.getAllAppointments();
-    }
-
     // для причастных клиента и мастера, которые связаны с конкретной записью
     @GetMapping("/{appointmentId}")
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long appointmentId) {
@@ -46,16 +36,20 @@ public class AppointmentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // для причастного клиента, который связан с конкретной записью
-    @GetMapping("/client/{clientId}")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByClient(@PathVariable Long clientId) {
-        return ResponseEntity.ok(appointmentService.getAppointmentsByClientId(clientId));
+    // для причастных клиента и мастера, которые связаны с конкретной записью
+    @GetMapping("/{appointmentId}/client")
+    public ResponseEntity<ClientDTO> getClientFromAppointment(@PathVariable Long appointmentId) {
+        return appointmentService.getClientByAppointmentId(appointmentId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // для причастного мастера, который связан с конкретной записью
-    @GetMapping("/master/{masterId}")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMaster(@PathVariable Long masterId) {
-        return ResponseEntity.ok(appointmentService.getAppointmentsByMasterId(masterId));
+    // для причастных клиента и мастера, которые связаны с конкретной записью
+    @GetMapping("/{appointmentId}/master")
+    public ResponseEntity<MasterDTO> getMasterFromAppointment(@PathVariable Long appointmentId) {
+        return appointmentService.getMasterByAppointmentId(appointmentId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // для причастных клиента и мастера, которые связаны с конкретной записью
@@ -65,15 +59,22 @@ public class AppointmentController {
     }
 
     // для причастных клиента и мастера, которые связаны с конкретной записью
-    @GetMapping("/dateAndTime/{dateAndTime}")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByDateAndTime(@PathVariable LocalDate date, LocalTime time) {
+    @GetMapping("/by-dateAndTime")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByDateAndTime(@RequestParam LocalDate date,
+                                                                             @RequestParam LocalTime time) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByDateAndTime(date, time));
     }
 
     // для причастных клиента и мастера, которые связаны с конкретной записью
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByStatus(@PathVariable AppointmentStatus status) {
+    @GetMapping("/by-status")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByStatus(@RequestParam AppointmentStatus status) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByStatus(status));
+    }
+
+    // для всех клиентов
+    @PostMapping("/create")
+    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> payload) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(payload));
     }
 
     // для причастного мастера, который связан с конкретной записью
@@ -97,5 +98,25 @@ public class AppointmentController {
     public ResponseEntity<Void> deleteAppointment(@PathVariable Long appointmentId) {
         appointmentService.deleteAppointment(appointmentId);
         return ResponseEntity.noContent().build();
+    }
+
+
+
+    // не надо (для причастного клиента, который связан с конкретной записью)
+    @GetMapping("/client/{clientId}")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByClient(@PathVariable Long clientId) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsByClientId(clientId));
+    }
+
+    // не надо (для причастного мастера, который связан с конкретной записью)
+    @GetMapping("/master/{masterId}")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMaster(@PathVariable Long masterId) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsByMasterId(masterId));
+    }
+
+    // не надо
+    @GetMapping
+    public List<AppointmentDTO> getAllAppointments() {
+        return appointmentService.getAllAppointments();
     }
 }

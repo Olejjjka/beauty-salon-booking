@@ -24,19 +24,6 @@ public class BeautyServiceController {
         this.beautyServiceService = beautyServiceService;
     }
 
-    // для всех мастеров
-    @PostMapping("/create")
-    public ResponseEntity<BeautyServiceDTO> createBeautyService(@RequestBody BeautyService beautyService) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(beautyServiceService.saveBeautyService(beautyService));
-    }
-
-    // не надо
-    @PostMapping("/{beautyServiceId}/masters/{masterId}")
-    public ResponseEntity<BeautyServiceDTO> addMasterToBeautyService(@PathVariable Long beautyServiceId, @PathVariable Long masterId) {
-        BeautyServiceDTO beautyServiceDTO = beautyServiceService.addMasterToBeautyService(beautyServiceId, masterId);
-        return ResponseEntity.ok(beautyServiceDTO);
-    }
-
     // для всех клиентов и мастеров
     @GetMapping
     public List<BeautyServiceDTO> getAllBeautyServices() {
@@ -52,8 +39,8 @@ public class BeautyServiceController {
     }
 
     // для всех клиентов и мастеров
-    @GetMapping("/by-name/{name}")
-    public ResponseEntity<BeautyServiceDTO> getBeautyServiceByName(@PathVariable String name) {
+    @GetMapping("/by-name")
+    public ResponseEntity<BeautyServiceDTO> getBeautyServiceByName(@RequestParam String name) {
         return beautyServiceService.getBeautyServiceByName(name)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -69,6 +56,12 @@ public class BeautyServiceController {
     @GetMapping("/{beautyServiceId}/masters")
     public ResponseEntity<List<MasterDTO>> getMastersByBeautyServiceId(@PathVariable Long beautyServiceId) {
         return ResponseEntity.ok(beautyServiceService.getMastersByBeautyServiceId(beautyServiceId));
+    }
+
+    // для всех мастеров
+    @PostMapping("/create")
+    public ResponseEntity<BeautyServiceDTO> createBeautyService(@RequestBody BeautyService beautyService) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(beautyServiceService.saveBeautyService(beautyService));
     }
 
     // для всех мастеров
@@ -92,6 +85,15 @@ public class BeautyServiceController {
     public ResponseEntity<Void> deleteBeautyService(@PathVariable Long beautyServiceId) {
         beautyServiceService.deleteBeautyService(beautyServiceId);
         return ResponseEntity.noContent().build();
+    }
+
+
+
+    // не надо
+    @PostMapping("/{beautyServiceId}/masters/{masterId}")
+    public ResponseEntity<BeautyServiceDTO> addMasterToBeautyService(@PathVariable Long beautyServiceId, @PathVariable Long masterId) {
+        BeautyServiceDTO beautyServiceDTO = beautyServiceService.addMasterToBeautyService(beautyServiceId, masterId);
+        return ResponseEntity.ok(beautyServiceDTO);
     }
 
     // не надо

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UserPrincipal implements UserDetails {
 
-    private final Long id; // <-- добавили ID
+    private final Long id;
     private final String login;
     private final String password;
     private final Role role;

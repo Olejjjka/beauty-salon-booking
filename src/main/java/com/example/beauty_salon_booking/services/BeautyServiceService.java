@@ -79,15 +79,6 @@ public class BeautyServiceService {
 
     // для всех мастеров
     @Transactional
-    public void deleteBeautyService(Long beautyServiceId) {
-        if (!authService.isCurrentUserMaster()) {
-            throw new SecurityException("Access denied: not the authorized master.");
-        }
-        beautyServiceRepository.deleteById(beautyServiceId);
-    }
-
-    // для всех мастеров
-    @Transactional
     public Optional<BeautyServiceDTO> replaceBeautyService(Long beautyServiceId, BeautyService newService) {
         if (!authService.isCurrentUserMaster()) {
             throw new SecurityException("Access denied: not the authorized master.");
@@ -119,6 +110,17 @@ public class BeautyServiceService {
             return dtoConverter.convertToBeautyServiceDTO(beautyServiceRepository.save(existingService));
         });
     }
+
+    // для всех мастеров
+    @Transactional
+    public void deleteBeautyService(Long beautyServiceId) {
+        if (!authService.isCurrentUserMaster()) {
+            throw new SecurityException("Access denied: not the authorized master.");
+        }
+        beautyServiceRepository.deleteById(beautyServiceId);
+    }
+
+
 
     // не надо
     @Transactional

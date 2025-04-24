@@ -43,11 +43,11 @@ public class ClientService {
         this.revokedTokenService = revokedTokenService;
     }
 
-    // не нужен (можно удалить)
-    public List<ClientDTO> getAllClients() {
-        return clientRepository.findAll().stream()
-                .map(dtoConverter::convertToClientDTO)
-                .toList();
+    // без ограничений
+    @Transactional
+    public ClientDTO saveClient(Client client) {
+        client.setPassword(passwordEncoder.encode(client.getPassword()));
+        return dtoConverter.convertToClientDTO(clientRepository.save(client));
     }
 
     // для причастного клиента
@@ -58,36 +58,12 @@ public class ClientService {
         return clientRepository.findById(clientId).map(dtoConverter::convertToClientDTO);
     }
 
-    // не нужен (можно удалить)
-    public Optional<ClientDTO> getClientByPhone(String phone) {
-        return clientRepository.findByPhone(phone).map(dtoConverter::convertToClientDTO);
-    }
-
-    // не нужен (можно удалить)
-    public Optional<ClientDTO> getClientByLogin(String login) {
-        return clientRepository.findByLogin(login).map(dtoConverter::convertToClientDTO);
-    }
-
     // для причастного клиента
     public List<AppointmentDTO> getAppointmentsByClientId(Long clientId) {
         authService.checkAccessToClient(clientId);
         return appointmentRepository.findByClientId(clientId).stream()
                 .map(dtoConverter::convertToAppointmentDTO)
                 .toList();
-    }
-
-    // без ограничений
-    @Transactional
-    public ClientDTO saveClient(Client client) {
-        client.setPassword(passwordEncoder.encode(client.getPassword()));
-        return dtoConverter.convertToClientDTO(clientRepository.save(client));
-    }
-
-    // для причастного клиента
-    @Transactional
-    public void deleteClient(Long clientId) {
-        authService.checkAccessToClient(clientId);
-        clientRepository.deleteById(clientId);
     }
 
     // для причастного клиента
@@ -147,4 +123,29 @@ public class ClientService {
         }
     }
 
+    // для причастного клиента
+    @Transactional
+    public void deleteClient(Long clientId) {
+        authService.checkAccessToClient(clientId);
+        clientRepository.deleteById(clientId);
+    }
+
+
+
+    // не нужен (можно удалить)
+    public List<ClientDTO> getAllClients() {
+        return clientRepository.findAll().stream()
+                .map(dtoConverter::convertToClientDTO)
+                .toList();
+    }
+
+    // не нужен (можно удалить)
+    public Optional<ClientDTO> getClientByPhone(String phone) {
+        return clientRepository.findByPhone(phone).map(dtoConverter::convertToClientDTO);
+    }
+
+    // не нужен (можно удалить)
+    public Optional<ClientDTO> getClientByLogin(String login) {
+        return clientRepository.findByLogin(login).map(dtoConverter::convertToClientDTO);
+    }
 }

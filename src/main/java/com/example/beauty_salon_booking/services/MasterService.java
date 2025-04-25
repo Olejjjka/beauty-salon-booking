@@ -33,6 +33,7 @@ public class MasterService {
     private final DTOConverter dtoConverter;
     private final AuthService authService;
     private final RevokedTokenService revokedTokenService;
+    private final UserValidationService userValidationService;
 
     @Autowired
     public MasterService(MasterRepository masterRepository,
@@ -41,7 +42,8 @@ public class MasterService {
                          PasswordEncoder passwordEncoder,
                          DTOConverter dtoConverter,
                          AuthService authService,
-                         RevokedTokenService revokedTokenService) {
+                         RevokedTokenService revokedTokenService,
+                         UserValidationService userValidationService) {
         this.masterRepository = masterRepository;
         this.beautyServiceRepository = beautyServiceRepository;
         this.appointmentRepository = appointmentRepository;
@@ -49,11 +51,13 @@ public class MasterService {
         this.dtoConverter = dtoConverter;
         this.authService = authService;
         this.revokedTokenService = revokedTokenService;
+        this.userValidationService = userValidationService;
     }
 
     // без ограничений
     @Transactional
     public MasterDTO saveMaster(Master master) {
+        userValidationService.validateLoginAndPhoneUniqueness(master.getLogin(), master.getPhone());
         master.setPassword(passwordEncoder.encode(master.getPassword()));
         return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
@@ -82,7 +86,7 @@ public class MasterService {
                         .map(dtoConverter::convertToBeautyServiceDTO)
                         .toList()
                 )
-                .orElse(Collections.emptyList());
+                .orElseThrow(() -> new EntityNotFoundException("Master not found"));
     }
 
     // для всех клиентов и мастеров

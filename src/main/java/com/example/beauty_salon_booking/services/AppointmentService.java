@@ -105,7 +105,7 @@ public class AppointmentService {
         Long beautyServiceId = ((Number) payload.get("beautyServiceId")).longValue();
         LocalDate date = LocalDate.parse((String) payload.get("date"));
         LocalTime time = LocalTime.parse((String) payload.get("time"));
-        AppointmentStatus status = AppointmentStatus.valueOf((String) payload.get("status"));
+        AppointmentStatus status = AppointmentStatus.PENDING;
 
         Appointment appointment = new Appointment();
         appointment.setClient(clientRepository.findById(clientId)

@@ -20,12 +20,10 @@ import com.example.beauty_salon_booking.services.ClientService;
 public class ClientController {
 
     private final ClientService clientService;
-    private final RevokedTokenService revokedTokenService;
 
     @Autowired
-    public ClientController(ClientService clientService, RevokedTokenService revokedTokenService) {
+    public ClientController(ClientService clientService) {
         this.clientService = clientService;
-        this.revokedTokenService = revokedTokenService;
     }
 
     // для причастного клиента

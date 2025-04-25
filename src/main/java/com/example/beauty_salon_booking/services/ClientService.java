@@ -28,24 +28,28 @@ public class ClientService {
     private final DTOConverter dtoConverter;
     private final AuthService authService;
     private final RevokedTokenService revokedTokenService;
+    private final UserValidationService userValidationService;
 
     public ClientService(ClientRepository clientRepository,
                          AppointmentRepository appointmentRepository,
                          PasswordEncoder passwordEncoder,
                          DTOConverter dtoConverter,
                          AuthService authService,
-                         RevokedTokenService revokedTokenService) {
+                         RevokedTokenService revokedTokenService,
+                         UserValidationService userValidationService) {
         this.clientRepository = clientRepository;
         this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.dtoConverter = dtoConverter;
         this.authService = authService;
         this.revokedTokenService = revokedTokenService;
+        this.userValidationService = userValidationService;
     }
 
     // без ограничений
     @Transactional
     public ClientDTO saveClient(Client client) {
+        userValidationService.validateLoginAndPhoneUniqueness(client.getLogin(), client.getPhone());
         client.setPassword(passwordEncoder.encode(client.getPassword()));
         return dtoConverter.convertToClientDTO(clientRepository.save(client));
     }

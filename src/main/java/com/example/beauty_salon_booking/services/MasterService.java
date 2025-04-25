@@ -86,7 +86,7 @@ public class MasterService {
                         .map(dtoConverter::convertToBeautyServiceDTO)
                         .toList()
                 )
-                .orElse(Collections.emptyList());
+                .orElseThrow(() -> new EntityNotFoundException("Master not found"));
     }
 
     // для всех клиентов и мастеров

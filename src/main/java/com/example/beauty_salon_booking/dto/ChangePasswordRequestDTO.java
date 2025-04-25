@@ -5,14 +5,6 @@ public class ChangePasswordRequestDTO {
     private String oldPassword;
     private String newPassword;
 
-    public ChangePasswordRequestDTO() {
-    }
-
-    public ChangePasswordRequestDTO(String oldPassword, String newPassword) {
-        this.oldPassword = oldPassword;
-        this.newPassword = newPassword;
-    }
-
     public String getOldPassword() {
         return oldPassword;
     }

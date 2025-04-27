@@ -1,4 +1,4 @@
-package com.example.beauty_salon_booking.entities; // замени на свой пакет
+package com.example.beauty_salon_booking.entities;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

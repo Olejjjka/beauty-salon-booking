@@ -10,6 +10,7 @@ import com.example.beauty_salon_booking.repositories.AppointmentRepository;
 import com.example.beauty_salon_booking.repositories.ClientRepository;
 import com.example.beauty_salon_booking.repositories.MasterRepository;
 import com.example.beauty_salon_booking.repositories.BeautyServiceRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,11 +110,11 @@ public class AppointmentService {
 
         Appointment appointment = new Appointment();
         appointment.setClient(clientRepository.findById(clientId)
-                .orElseThrow(() -> new IllegalArgumentException("Client not found")));
+                .orElseThrow(() -> new EntityNotFoundException("Client not found")));
         appointment.setMaster(masterRepository.findById(masterId)
-                .orElseThrow(() -> new IllegalArgumentException("Master not found")));
+                .orElseThrow(() -> new EntityNotFoundException ("Master not found")));
         appointment.setBeautyService(beautyServiceRepository.findById(beautyServiceId)
-                .orElseThrow(() -> new IllegalArgumentException("Beauty Service not found")));
+                .orElseThrow(() -> new EntityNotFoundException ("Beauty Service not found")));
         appointment.setDate(date);
         appointment.setTime(time);
         appointment.setStatus(status);
@@ -125,7 +126,7 @@ public class AppointmentService {
     @Transactional
     public Optional<AppointmentDTO> replaceAppointment(Long appointmentId, Appointment newAppointment) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+                .orElseThrow(() -> new EntityNotFoundException ("Appointment not found"));
         authService.checkAccessFromMasterToAppointment(appointment);
 
         appointment.setClient(newAppointment.getClient());
@@ -142,7 +143,7 @@ public class AppointmentService {
     @Transactional
     public Optional<AppointmentDTO> updateAppointment(Long appointmentId, Map<String, Object> updates) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+                .orElseThrow(() -> new EntityNotFoundException ("Appointment not found"));
         authService.checkAccessFromMasterToAppointment(appointment);
 
         if (updates.containsKey("clientId")) {

@@ -3,7 +3,6 @@ package com.example.beauty_salon_booking.controllers;
 import com.example.beauty_salon_booking.dto.AppointmentDTO;
 import com.example.beauty_salon_booking.dto.ChangePasswordRequestDTO;
 import com.example.beauty_salon_booking.dto.ClientDTO;
-import com.example.beauty_salon_booking.services.RevokedTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,14 +41,6 @@ public class ClientController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(appointments);
-    }
-
-    // для причастного клиента
-    @PutMapping("/{clientId}")
-    public ResponseEntity<ClientDTO> replaceClient(@PathVariable Long clientId, @RequestBody Client newClient) {
-        return clientService.replaceClient(clientId, newClient)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
     }
 
     // для причастного клиента
@@ -97,6 +88,14 @@ public class ClientController {
     @GetMapping("/by-login")
     public ResponseEntity<ClientDTO> getClientByLogin(@RequestParam String login) {
         return clientService.getClientByLogin(login)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // не надо (для причастного клиента)
+    @PutMapping("/{clientId}")
+    public ResponseEntity<ClientDTO> replaceClient(@PathVariable Long clientId, @RequestBody Client newClient) {
+        return clientService.replaceClient(clientId, newClient)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

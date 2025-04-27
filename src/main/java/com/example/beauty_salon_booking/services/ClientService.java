@@ -6,6 +6,7 @@ import com.example.beauty_salon_booking.dto.DTOConverter;
 import com.example.beauty_salon_booking.entities.Client;
 import com.example.beauty_salon_booking.repositories.AppointmentRepository;
 import com.example.beauty_salon_booking.repositories.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,30 +73,22 @@ public class ClientService {
 
     // для причастного клиента
     @Transactional
-    public Optional<ClientDTO> replaceClient(Long clientId, Client newClient) {
-        authService.checkAccessToClient(clientId);
-        return clientRepository.findById(clientId).map(existingClient -> {
-            existingClient.setName(newClient.getName());
-            existingClient.setPhone(newClient.getPhone());
-            existingClient.setLogin(newClient.getLogin());
-            existingClient.setPassword(passwordEncoder.encode(newClient.getPassword()));
-            return dtoConverter.convertToClientDTO(clientRepository.save(existingClient));
-        });
-    }
-
-    // для причастного клиента
-    @Transactional
     public Optional<ClientDTO> updateClient(Long clientId, Map<String, Object> updates) {
         authService.checkAccessToClient(clientId);
+
         return clientRepository.findById(clientId).map(existingClient -> {
             if (updates.containsKey("name")) {
                 existingClient.setName((String) updates.get("name"));
             }
             if (updates.containsKey("phone")) {
-                existingClient.setPhone((String) updates.get("phone"));
+                String phone = (String) updates.get("phone");
+                userValidationService.validatePhoneUniqueness(phone);
+                existingClient.setPhone(phone);
             }
             if (updates.containsKey("login")) {
-                existingClient.setLogin((String) updates.get("login"));
+                String login = (String) updates.get("login");
+                userValidationService.validateLoginUniqueness(login);
+                existingClient.setLogin(login);
             }
             return dtoConverter.convertToClientDTO(clientRepository.save(existingClient));
         });
@@ -107,7 +100,7 @@ public class ClientService {
         authService.checkAccessToClient(clientId);
 
         Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Client not found"));
 
         if (!passwordEncoder.matches(oldPassword, client.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
@@ -151,5 +144,19 @@ public class ClientService {
     // не нужен (можно удалить)
     public Optional<ClientDTO> getClientByLogin(String login) {
         return clientRepository.findByLogin(login).map(dtoConverter::convertToClientDTO);
+    }
+
+    // не надо (для причастного клиента)
+    @Transactional
+    public Optional<ClientDTO> replaceClient(Long clientId, Client newClient) {
+        authService.checkAccessToClient(clientId);
+        userValidationService.validateLoginAndPhoneUniqueness(newClient.getLogin(), newClient.getPhone());
+        return clientRepository.findById(clientId).map(existingClient -> {
+            existingClient.setName(newClient.getName());
+            existingClient.setPhone(newClient.getPhone());
+            existingClient.setLogin(newClient.getLogin());
+            existingClient.setPassword(passwordEncoder.encode(newClient.getPassword()));
+            return dtoConverter.convertToClientDTO(clientRepository.save(existingClient));
+        });
     }
 }

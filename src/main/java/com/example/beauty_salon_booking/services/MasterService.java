@@ -131,7 +131,7 @@ public class MasterService {
         List<AvailableTimeSlotDTO> busyIntervals = appointments.stream()
                 .map(appointment -> new AvailableTimeSlotDTO(appointment.getTime(), appointment.getTime().plusHours(2)))
                 .sorted(Comparator.comparing(AvailableTimeSlotDTO::getStart))
-                .collect(Collectors.toList());
+                .toList();
 
         LocalTime currentStart = startOfDay;
 
@@ -166,53 +166,68 @@ public class MasterService {
     @Transactional
     public MasterDTO addBeautyServiceToMaster(Long masterId, Long beautyServiceId) {
         authService.checkAccessToMaster(masterId);
+
+        // Получаем мастера
         Master master = masterRepository.findById(masterId)
                 .orElseThrow(() -> new EntityNotFoundException("Master not found"));
+
+        // Получаем услугу
         BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId)
                 .orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
 
+        // Проверяем, привязана ли уже услуга к данному мастеру
+        if (master.getBeautyServices().contains(beautyService)) {
+            throw new IllegalStateException("This beauty service is already assigned to this master.");
+        }
+
+        // Добавляем услугу мастеру
         master.addBeautyService(beautyService);
+
+        // Сохраняем изменения и возвращаем обновленного мастера
         return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
+
 
     // для причастного мастера
     @Transactional
     public MasterDTO removeBeautyServiceFromMaster(Long masterId, Long beautyServiceId) {
         authService.checkAccessToMaster(masterId);
-        Master master = masterRepository.findById(masterId).
-                orElseThrow(() -> new EntityNotFoundException("Master not found"));
-        BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId).
-                orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
+
+        // Получаем мастера
+        Master master = masterRepository.findById(masterId)
+                .orElseThrow(() -> new EntityNotFoundException("Master not found"));
+
+        // Получаем услугу
+        BeautyService beautyService = beautyServiceRepository.findById(beautyServiceId)
+                .orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
+
+        // Проверяем, привязана ли услуга к данному мастеру
+        if (!master.getBeautyServices().contains(beautyService)) {
+            throw new IllegalStateException("This beauty service is not assigned to this master.");
+        }
 
         master.removeBeautyService(beautyService);
-        return dtoConverter.convertToMasterDTO(masterRepository.save(master));
-    }
 
-    // для причастного мастера
-    @Transactional
-    public Optional<MasterDTO> replaceMaster(Long masterId, Master newMaster) {
-        authService.checkAccessToMaster(masterId);
-        return masterRepository.findById(masterId).map(existingMaster -> {
-            existingMaster.setName(newMaster.getName());
-            existingMaster.setPhone(newMaster.getPhone());
-            existingMaster.setLogin(newMaster.getLogin());
-            existingMaster.setPassword(newMaster.getPassword());
-            return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
-        });
+        return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 
     // для причастного мастера
     @Transactional
     public Optional<MasterDTO> updateMaster(Long masterId, Map<String, Object> updates) {
         authService.checkAccessToMaster(masterId);
+
         return masterRepository.findById(masterId).map(existingMaster -> {
             if (updates.containsKey("name")) {
                 existingMaster.setName((String) updates.get("name"));
             }
             if (updates.containsKey("phone")) {
+                String phone = (String) updates.get("phone");
+                userValidationService.validatePhoneUniqueness(phone);
                 existingMaster.setPhone((String) updates.get("phone"));
             }
             if (updates.containsKey("login")) {
+                String login = (String) updates.get("login");
+                userValidationService.validateLoginUniqueness(login);
                 existingMaster.setLogin((String) updates.get("login"));
             }
             return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
@@ -225,7 +240,7 @@ public class MasterService {
         authService.checkAccessToMaster(masterId);
 
         Master master = masterRepository.findById(masterId)
-                .orElseThrow(() -> new RuntimeException("Master not found"));
+                .orElseThrow(() -> new EntityNotFoundException ("Master not found"));
 
         if (!passwordEncoder.matches(oldPassword, master.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
@@ -262,5 +277,19 @@ public class MasterService {
     // не надо
     public Optional<MasterDTO> getMasterByLogin(String login) {
         return masterRepository.findByLogin(login).map(dtoConverter::convertToMasterDTO);
+    }
+
+    // не надо (для причастного мастера)
+    @Transactional
+    public Optional<MasterDTO> replaceMaster(Long masterId, Master newMaster) {
+        authService.checkAccessToMaster(masterId);
+        userValidationService.validateLoginAndPhoneUniqueness(newMaster.getLogin(), newMaster.getPhone());
+        return masterRepository.findById(masterId).map(existingMaster -> {
+            existingMaster.setName(newMaster.getName());
+            existingMaster.setPhone(newMaster.getPhone());
+            existingMaster.setLogin(newMaster.getLogin());
+            existingMaster.setPassword(newMaster.getPassword());
+            return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
+        });
     }
 }

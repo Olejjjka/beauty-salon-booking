@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class MasterController {
             @RequestParam LocalDate endDate) {
 
         if (endDate.isBefore(startDate)) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(Collections.emptyMap());
         }
 
         Map<LocalDate, List<AvailableTimeSlotDTO>> availableSlots =
@@ -86,14 +87,6 @@ public class MasterController {
     public ResponseEntity<Void> removeBeautyServiceFromMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
         masterService.removeBeautyServiceFromMaster(masterId, beautyServiceId);
         return ResponseEntity.noContent().build();
-    }
-
-    // для причастного мастера
-    @PutMapping("/{masterId}")
-    public ResponseEntity<MasterDTO> replaceMaster(@PathVariable Long masterId, @RequestBody Master newMaster) {
-        return masterService.replaceMaster(masterId, newMaster)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
     }
 
     // для причастного мастера
@@ -135,6 +128,14 @@ public class MasterController {
     @GetMapping("/by-login")
     public ResponseEntity<MasterDTO> getMasterByLogin(@RequestParam String login) {
         return masterService.getMasterByLogin(login)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // не надо (для причастного мастера)
+    @PutMapping("/{masterId}")
+    public ResponseEntity<MasterDTO> replaceMaster(@PathVariable Long masterId, @RequestBody Master newMaster) {
+        return masterService.replaceMaster(masterId, newMaster)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

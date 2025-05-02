@@ -53,6 +53,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/beauty-services/**").hasAnyRole("CLIENT", "MASTER")
                         .requestMatchers(HttpMethod.GET, "/api/appointments/**").hasAnyRole("CLIENT", "MASTER")
 
+                        ///
+                                .requestMatchers("/dashboard").hasAnyRole("CLIENT", "MASTER")
+
                         // CLIENT: доступ к своим данным
                         .requestMatchers("/api/clients/**").hasRole("CLIENT")
 

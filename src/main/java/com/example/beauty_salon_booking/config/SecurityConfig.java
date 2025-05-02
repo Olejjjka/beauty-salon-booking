@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Эндпоинты авторизации
                         .requestMatchers("/login").permitAll()
+                                .requestMatchers("/register").permitAll()
                         .requestMatchers("/api/auth/register/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/logout").authenticated()

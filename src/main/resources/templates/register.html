@@ -3,7 +3,7 @@
 <head><title>Регистрация</title></head>
 <body>
 <h2>Регистрация</h2>
-<form th:action="@{/api/auth/register/client}" th:object="${registerRequest}" method="post">
+<form th:action="@{/register}" th:object="${registerRequest}" method="post">
     <input type="text" th:field="*{login}" placeholder="Логин"/>
     <input type="password" th:field="*{password}" placeholder="Пароль"/>
     <input type="text" th:field="*{name}" placeholder="Имя"/>

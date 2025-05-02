@@ -51,6 +51,23 @@ public class AuthPageController {
         return "login";
     }
 
+    @PostMapping("/login")
+    public String handleLogin(@ModelAttribute LoginRequestDTO loginRequest, HttpSession session, Model model) {
+        try {
+            // аутентификация пользователя
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword())
+            );
+            session.setAttribute("username", loginRequest.getLogin());
+            return "redirect:/dashboard";
+        } catch (Exception e) {
+            // Логирование ошибки
+            logger.error("Authentication failed for user: {}", loginRequest.getLogin(), e);
+            model.addAttribute("error", "Неверный логин или пароль");
+            return "login";
+        }
+    }
+
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("registerRequest", new RegisterRequestDTO());
@@ -103,23 +120,6 @@ public class AuthPageController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
-    }
-
-    @PostMapping("/login")
-    public String handleLogin(@ModelAttribute LoginRequestDTO loginRequest, HttpSession session, Model model) {
-        try {
-            // аутентификация пользователя
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword())
-            );
-            session.setAttribute("username", loginRequest.getLogin());
-            return "redirect:/dashboard";
-        } catch (Exception e) {
-            // Логирование ошибки
-            logger.error("Authentication failed for user: {}", loginRequest.getLogin(), e);
-            model.addAttribute("error", "Неверный логин или пароль");
-            return "login";
-        }
     }
 }
 

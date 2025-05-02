@@ -59,4 +59,15 @@ public class RegisterRequestDTO {
         master.setPhone(this.phone);
         return master;
     }
+
+    // не обязательно, но желательно для UI-связки
+
+    @Override
+    public String toString() {
+        return "RegisterRequestDTO{" +
+                "login='" + login + '\'' +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                '}';
+    }
 }

@@ -71,6 +71,12 @@ public class ClientService {
                 .toList();
     }
 
+    public Long getClientIdByLogin(String login) {
+        return clientRepository.findByLogin(login)
+                .orElseThrow(() -> new EntityNotFoundException("Client not found"))
+                .getId();
+    }
+
     // для причастного клиента
     @Transactional
     public Optional<ClientDTO> updateClient(Long clientId, Map<String, Object> updates) {
@@ -126,8 +132,6 @@ public class ClientService {
         authService.checkAccessToClient(clientId);
         clientRepository.deleteById(clientId);
     }
-
-
 
     // не нужен (можно удалить)
     public List<ClientDTO> getAllClients() {

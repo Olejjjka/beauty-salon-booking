@@ -31,7 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Пропускаем проверку для эндпоинтов авторизации
         if (request.getRequestURI().startsWith("/api/auth/register") ||
-                request.getRequestURI().startsWith("/api/auth/login")) {
+                request.getRequestURI().startsWith("/api/auth/login") ||
+                (request.getRequestURI().startsWith("/register") ||
+                request.getRequestURI().startsWith("/login")))  {
             filterChain.doFilter(request, response);
             return;
         }

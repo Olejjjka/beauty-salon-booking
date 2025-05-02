@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 
 
 @Configuration
@@ -40,6 +41,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // Эндпоинты авторизации
+                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/api/auth/register/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/logout").authenticated()
@@ -66,7 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/appointments/**").hasRole("MASTER")
 
                         // Запрет по умолчанию на всё остальное
-                        .anyRequest().authenticated()
+                        //.anyRequest().authenticated()
                 )
 
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, revokedTokenService), UsernamePasswordAuthenticationFilter.class);
@@ -90,5 +92,10 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

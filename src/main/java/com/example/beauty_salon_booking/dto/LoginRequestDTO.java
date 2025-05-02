@@ -20,4 +20,12 @@ public class LoginRequestDTO {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    // не обязательно, но желательно для UI-связки
+    @Override
+    public String toString() {
+        return "LoginRequestDTO{" +
+                "login='" + login + '\'' +
+                '}';
+    }
 }

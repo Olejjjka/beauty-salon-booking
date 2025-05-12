@@ -1,15 +1,12 @@
 package com.example.beauty_salon_booking.controllers;
 
-import com.example.beauty_salon_booking.dto.AppointmentDTO;
-import com.example.beauty_salon_booking.dto.AvailableTimeSlotDTO;
-import com.example.beauty_salon_booking.dto.BeautyServiceDTO;
-import com.example.beauty_salon_booking.dto.MasterDTO;
+import com.example.beauty_salon_booking.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,60 +24,35 @@ public class MasterController {
         this.masterService = masterService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<MasterDTO> createMaster(@RequestBody Master master) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(masterService.saveMaster(master));
-    }
-
-    @PostMapping("/{masterId}/beauty-services/{beautyServiceId}")
-    public ResponseEntity<MasterDTO> addBeautyServiceToMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
-        MasterDTO masterDTO = masterService.addBeautyServiceToMaster(masterId, beautyServiceId);
-        return ResponseEntity.ok(masterDTO);
-    }
-
+    // для всех клиентов и мастеров
     @GetMapping
     public List<MasterDTO> getAllMasters() {
         return masterService.getAllMasters();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MasterDTO> getMasterById(@PathVariable Long id) {
-        return masterService.getMasterById(id)
+    // для всех клиентов и мастеров
+    @GetMapping("/{masterId}")
+    public ResponseEntity<MasterDTO> getMasterById(@PathVariable Long masterId) {
+        return masterService.getMasterById(masterId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/by-name/{name}")
-    public ResponseEntity<MasterDTO> getMasterByName(@PathVariable String name) {
+    // для всех клиентов и мастеров
+    @GetMapping("/by-name")
+    public ResponseEntity<MasterDTO> getMasterByName(@RequestParam String name) {
         return masterService.getMasterByName(name)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/by-phone/{phone}")
-    public ResponseEntity<MasterDTO> getMasterByPhone(@PathVariable String phone) {
-        return masterService.getMasterByPhone(phone)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/by-login/{login}")
-    public ResponseEntity<MasterDTO> getMasterByLogin(@PathVariable String login) {
-        return masterService.getMasterByLogin(login)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
+    // для всех клиентов и мастеров
     @GetMapping("/{masterId}/beauty-services")
     public ResponseEntity<List<BeautyServiceDTO>> getBeautyServicesByMasterId(@PathVariable Long masterId) {
         return ResponseEntity.ok(masterService.getBeautyServicesByMasterId(masterId));
     }
 
-    @GetMapping("/{masterId}/appointments")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMasterId(@PathVariable Long masterId) {
-        return ResponseEntity.ok(masterService.getAppointmentsByMasterId(masterId));
-    }
-
+    // для всех клиентов и мастеров
     @GetMapping("/{masterId}/available-time-slots")
     public ResponseEntity<Map<LocalDate, List<AvailableTimeSlotDTO>>> getAvailableTimeSlots(
             @PathVariable Long masterId,
@@ -88,7 +60,7 @@ public class MasterController {
             @RequestParam LocalDate endDate) {
 
         if (endDate.isBefore(startDate)) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(Collections.emptyMap());
         }
 
         Map<LocalDate, List<AvailableTimeSlotDTO>> availableSlots =
@@ -97,29 +69,74 @@ public class MasterController {
         return ResponseEntity.ok(availableSlots);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<MasterDTO> replaceMaster(@PathVariable Long id, @RequestBody Master newMaster) {
-        return masterService.replaceMaster(id, newMaster)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // для причастного мастера
+    @GetMapping("/{masterId}/appointments")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByMasterId(@PathVariable Long masterId) {
+        return ResponseEntity.ok(masterService.getAppointmentsByMasterId(masterId));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<MasterDTO> updateMaster(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        return masterService.updateMaster(id, updates)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // для причастного мастера
+    @PostMapping("/{masterId}/beauty-services/{beautyServiceId}")
+    public ResponseEntity<MasterDTO> addBeautyServiceToMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
+        MasterDTO masterDTO = masterService.addBeautyServiceToMaster(masterId, beautyServiceId);
+        return ResponseEntity.ok(masterDTO);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMaster(@PathVariable Long id) {
-        masterService.deleteMaster(id);
-        return ResponseEntity.noContent().build();
-    }
-
+    // для причастного мастера
     @DeleteMapping("/{masterId}/beauty-services/{beautyServiceId}")
     public ResponseEntity<Void> removeBeautyServiceFromMaster(@PathVariable Long masterId, @PathVariable Long beautyServiceId) {
         masterService.removeBeautyServiceFromMaster(masterId, beautyServiceId);
         return ResponseEntity.noContent().build();
+    }
+
+    // для причастного мастера
+    @PatchMapping("/{masterId}")
+    public ResponseEntity<MasterDTO> updateMaster(@PathVariable Long masterId, @RequestBody Map<String, Object> updates) {
+        return masterService.updateMaster(masterId, updates)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // для причастного мастера
+    @PostMapping("/{masterId}/change-password")
+    public ResponseEntity<?> changePassword(
+            @PathVariable Long masterId,
+            @RequestBody ChangePasswordRequestDTO requestDto
+    ) {
+        masterService.changePassword(masterId, requestDto.getOldPassword(), requestDto.getNewPassword());
+        return ResponseEntity.ok("Password changed successfully. Please log in again.");
+    }
+
+    // для причастного мастера
+    @DeleteMapping("/{masterId}")
+    public ResponseEntity<Void> deleteMaster(@PathVariable Long masterId) {
+        masterService.deleteMaster(masterId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
+    // не надо
+    @GetMapping("/by-phone")
+    public ResponseEntity<MasterDTO> getMasterByPhone(@RequestParam String phone) {
+        return masterService.getMasterByPhone(phone)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // не надо
+    @GetMapping("/by-login")
+    public ResponseEntity<MasterDTO> getMasterByLogin(@RequestParam String login) {
+        return masterService.getMasterByLogin(login)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // не надо (для причастного мастера)
+    @PutMapping("/{masterId}")
+    public ResponseEntity<MasterDTO> replaceMaster(@PathVariable Long masterId, @RequestBody Master newMaster) {
+        return masterService.replaceMaster(masterId, newMaster)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

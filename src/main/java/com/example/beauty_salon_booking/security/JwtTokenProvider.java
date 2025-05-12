@@ -1,61 +1,82 @@
 package com.example.beauty_salon_booking.security;
 
+import com.example.beauty_salon_booking.enums.Role;
 import io.jsonwebtoken.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.security.Key;
+import java.util.*;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String JWT_SECRET = "your_secret_key"; // желательно вынести в application.properties
-    private final long JWT_EXPIRATION = 86400000; // 1 день
+    byte[] SECRET = "1QxkT8o6Bz1gRGylRG3C/qhdL8FvjgIE3wJ3nSC9E2vO7aCZXtkxN03RJ1rU2kYUbA6UQ9e7T4XT8zJghPIuBA==".getBytes(); // Секретный ключ
+    private final Key key = Keys.hmacShaKeyFor(SECRET);
 
-    @Autowired
-    private MyUserDetailsService myUserDetailsService;
+
+    private final long JWT_EXPIRATION = 86400000; // 1 день
 
     // Генерация токена
     public String generateToken(Authentication authentication) {
-        String username = ((UserPrincipal) authentication.getPrincipal()).getUsername();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
+        String role = userPrincipal.getRole().name();
+
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userPrincipal.getUsername())                  // login
+                .claim("id", userPrincipal.getId())                    // id
+                .claim("role", role)                                   // роль
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
-                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .signWith(key)
                 .compact();
     }
 
     // Валидация токена
     public boolean validateToken(String token) {
         try {
-            Jwts.parser() // Используем старый метод parser()
-                    .setSigningKey(JWT_SECRET) // Устанавливаем ключ для проверки подписи
+            Jwts.parser()
+                    .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(token); // Парсим JWS токен
+                    .parseClaimsJws(token);
             return true;
-        } catch (SignatureException | MalformedJwtException | ExpiredJwtException |
-                 UnsupportedJwtException | IllegalArgumentException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
     // Получить аутентификацию по токену
     public Authentication getAuthentication(String token) {
-        UserPrincipal userPrincipal = (UserPrincipal) myUserDetailsService.loadUserByUsername(getLoginFromToken(token));
-        return new UsernamePasswordAuthenticationToken(userPrincipal, "", userPrincipal.getAuthorities());
-    }
-
-    // Извлечь логин из токена
-    public String getLoginFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(JWT_SECRET)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody(); // Получаем тело токена
-        return claims.getSubject(); // Извлекаем логин (subject) из токена
+                .getBody();
+
+        Long id = claims.get("id", Integer.class).longValue();
+        String login = claims.getSubject();
+        String roleStr = claims.get("role", String.class);
+        Role role = Role.valueOf(roleStr);
+
+        UserPrincipal userPrincipal = new UserPrincipal(id, login, null, role);
+
+        Collection<SimpleGrantedAuthority> authorities =
+                List.of(new SimpleGrantedAuthority("ROLE_" + roleStr));
+
+        return new UsernamePasswordAuthenticationToken(userPrincipal, "", authorities);
+    }
+    
+    // Получить логин из токена
+    public String getLoginFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
     }
 }

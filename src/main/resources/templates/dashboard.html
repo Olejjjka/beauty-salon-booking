@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Личный кабинет</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h2>Добро пожаловать, <span th:text="${username}">пользователь</span>!</h2>
+
+<a th:href="@{/logout}">Выйти</a>
+
+<h3>Ваши записи:</h3>
+<ul>
+    <li th:each="record : ${records}">
+        <strong>Дата:</strong> <span th:text="${record.date}">дата</span>,
+        <strong>Время:</strong> <span th:text="${record.time}">время</span>,
+        <strong>Услуга:</strong> <span th:text="${record.beautyService.name}">услуга</span>,
+        <strong>Мастер:</strong> <span th:text="${record.master.name}">мастер</span>,
+        <strong>Статус:</strong> <span th:text="${record.status}">статус</span>
+    </li>
+</ul>
+</body>
+</html>

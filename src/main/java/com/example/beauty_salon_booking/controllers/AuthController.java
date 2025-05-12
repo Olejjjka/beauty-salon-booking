@@ -58,7 +58,9 @@ public class AuthController {
         return ResponseEntity.ok(new TokenResponseDTO(token));
     }
 
-    // Выход из системы и отзыв токена
+
+
+    // Не нужен (Выход из системы и отзыв токена)
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

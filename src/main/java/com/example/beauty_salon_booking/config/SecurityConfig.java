@@ -38,14 +38,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-
+                .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Эндпоинты авторизации
-                        .requestMatchers("/login").permitAll()
-                                .requestMatchers("/register").permitAll()
-                        .requestMatchers("/api/auth/register/**").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/logout").authenticated()
+                        .requestMatchers("/", "/login", "/register", "/api/auth/**").permitAll()
 
                         // CLIENT: доступ к просмотру мастеров и услуг
                         .requestMatchers(HttpMethod.GET, "/api/masters/*/appointments").hasRole("MASTER")
@@ -54,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/appointments/**").hasAnyRole("CLIENT", "MASTER")
 
                         ///
-                                .requestMatchers("/dashboard").hasAnyRole("CLIENT", "MASTER")
+                        .requestMatchers("/dashboard").hasAnyRole("CLIENT", "MASTER")
 
                         // CLIENT: доступ к своим данным
                         .requestMatchers("/api/clients/**").hasRole("CLIENT")
@@ -72,12 +68,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/appointments/**").hasRole("MASTER")
 
                         // Запрет по умолчанию на всё остальное
-                        //.anyRequest().authenticated()
+                        .anyRequest().authenticated()
                 )
 
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, revokedTokenService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenProvider, revokedTokenService);
     }
 
     @Bean

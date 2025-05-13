@@ -11,14 +11,21 @@
 <form th:action="@{/login}" th:object="${loginRequest}" method="post">
     <div>
         <label for="login">Логин:</label>
-        <input type="text" id="login" th:field="*{login}" placeholder="Введите логин"/>
-    </div>
-    <div>
-        <label for="password">Пароль:</label>
-        <input type="password" id="password" th:field="*{password}" placeholder="Введите пароль"/>
+        <input type="text" id="login" th:field="*{login}" placeholder="Введите логин" required/>
+        <div th:if="${#fields.hasErrors('login')}" style="color: red;">
+            <p th:errors="*{login}"></p>
+        </div>
     </div>
 
-    <!-- Блок отображения ошибки -->
+    <div>
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" th:field="*{password}" placeholder="Введите пароль" required/>
+        <div th:if="${#fields.hasErrors('password')}" style="color: red;">
+            <p th:errors="*{password}"></p>
+        </div>
+    </div>
+
+    <!-- Общая ошибка (например, неверный логин или пароль) -->
     <div th:if="${error}" style="color: red;">
         <p th:text="${error}"></p>
     </div>

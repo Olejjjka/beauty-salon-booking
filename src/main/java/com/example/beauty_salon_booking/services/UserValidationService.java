@@ -5,6 +5,7 @@ import com.example.beauty_salon_booking.repositories.ClientRepository;
 import com.example.beauty_salon_booking.repositories.MasterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class UserValidationService {
@@ -18,7 +19,15 @@ public class UserValidationService {
         this.masterRepository = masterRepository;
     }
 
-    public void validateLoginUniqueness(String login) {
+    private void validateRequired(String field, String fieldName) {
+        if (!StringUtils.hasText(field)) {
+            throw new ValidationException(fieldName + " must not be empty or just whitespace");
+        }
+    }
+
+    public void validateLogin(String login) {
+        validateRequired(login, "Login");
+
         boolean loginTaken = clientRepository.findByLogin(login).isPresent()
                 || masterRepository.findByLogin(login).isPresent();
 
@@ -27,8 +36,7 @@ public class UserValidationService {
         }
     }
 
-    public void validatePhoneUniqueness(String phone) {
-        // Проверка формата телефона
+    public void validatePhone(String phone) {
         if (!phone.matches("^\\+79\\d{9}$")) {
             throw new ValidationException("The phone number must be in the format: +79*********");
         }
@@ -41,10 +49,23 @@ public class UserValidationService {
         }
     }
 
-    public void validateLoginAndPhoneUniqueness(String login, String phone) {
-        // Проверка формата телефона
-        validateLoginUniqueness(login);
+    public void validatePassword(String password) {
+        validateRequired(password, "Password");
+    }
 
-        validatePhoneUniqueness(phone);
+    public void validateName(String name) {
+        validateRequired(name, "Name");
+    }
+
+    public void validateLoginAndPhone(String login, String phone) {
+        validateLogin(login);
+        validatePhone(phone);
+    }
+
+    public void validateAll(String login, String password, String name, String phone) {
+        validateLogin(login);
+        validatePassword(password);
+        validateName(name);
+        validatePhone(phone);
     }
 }

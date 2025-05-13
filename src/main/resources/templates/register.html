@@ -1,16 +1,56 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Регистрация</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+</head>
 <body>
+
 <h2>Регистрация</h2>
+
 <form th:action="@{/register}" th:object="${registerRequest}" method="post">
-    <input type="text" th:field="*{login}" placeholder="Логин"/>
-    <input type="password" th:field="*{password}" placeholder="Пароль"/>
-    <input type="text" th:field="*{name}" placeholder="Имя"/>
-    <input type="text" th:field="*{phone}" placeholder="Телефон"/>
+
+    <div>
+        <label for="login">Логин:</label>
+        <input type="text" id="login" th:field="*{login}" placeholder="Логин" required/>
+        <div th:if="${#fields.hasErrors('login')}" style="color: red;">
+            <p th:errors="*{login}"></p>
+        </div>
+    </div>
+
+    <div>
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" th:field="*{password}" placeholder="Пароль" required/>
+        <div th:if="${#fields.hasErrors('password')}" style="color: red;">
+            <p th:errors="*{password}"></p>
+        </div>
+    </div>
+
+    <div>
+        <label for="name">Имя:</label>
+        <input type="text" id="name" th:field="*{name}" placeholder="Имя" required/>
+        <div th:if="${#fields.hasErrors('name')}" style="color: red;">
+            <p th:errors="*{name}"></p>
+        </div>
+    </div>
+
+    <div>
+        <label for="phone">Телефон:</label>
+        <input type="text" id="phone" th:field="*{phone}" placeholder="Телефон" required/>
+        <div th:if="${#fields.hasErrors('phone')}" style="color: red;">
+            <p th:errors="*{phone}"></p>
+        </div>
+    </div>
+
+    <!-- Общая ошибка (например, от API) -->
+    <div th:if="${error}" style="color: red;">
+        <p th:text="${error}"></p>
+    </div>
+
     <button type="submit">Зарегистрироваться</button>
 </form>
-<a href="/login">Уже есть аккаунт?</a>
+
+<p>Уже есть аккаунт? <a th:href="@{/login}">Войдите</a></p>
+
 </body>
 </html>
-

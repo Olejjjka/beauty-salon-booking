@@ -57,7 +57,7 @@ public class MasterService {
     // без ограничений
     @Transactional
     public MasterDTO saveMaster(Master master) {
-        userValidationService.validateLoginAndPhoneUniqueness(master.getLogin(), master.getPhone());
+        userValidationService.validateAll(master.getLogin(), master.getPassword(), master.getName(), master.getPhone());
         master.setPassword(passwordEncoder.encode(master.getPassword()));
         return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
@@ -218,16 +218,18 @@ public class MasterService {
 
         return masterRepository.findById(masterId).map(existingMaster -> {
             if (updates.containsKey("name")) {
-                existingMaster.setName((String) updates.get("name"));
+                String name = (String) updates.get("name");
+                userValidationService.validateName(name);
+                existingMaster.setName(name);
             }
             if (updates.containsKey("phone")) {
                 String phone = (String) updates.get("phone");
-                userValidationService.validatePhoneUniqueness(phone);
-                existingMaster.setPhone((String) updates.get("phone"));
+                userValidationService.validatePhone(phone);
+                existingMaster.setPhone(phone);
             }
             if (updates.containsKey("login")) {
                 String login = (String) updates.get("login");
-                userValidationService.validateLoginUniqueness(login);
+                userValidationService.validateLogin(login);
                 existingMaster.setLogin((String) updates.get("login"));
             }
             return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
@@ -246,6 +248,7 @@ public class MasterService {
             throw new RuntimeException("Current password is incorrect");
         }
 
+        userValidationService.validatePassword(newPassword);
         master.setPassword(passwordEncoder.encode(newPassword));
         masterRepository.save(master);
 
@@ -283,7 +286,7 @@ public class MasterService {
     @Transactional
     public Optional<MasterDTO> replaceMaster(Long masterId, Master newMaster) {
         authService.checkAccessToMaster(masterId);
-        userValidationService.validateLoginAndPhoneUniqueness(newMaster.getLogin(), newMaster.getPhone());
+        userValidationService.validateAll(newMaster.getLogin(), newMaster.getPassword(), newMaster.getName(), newMaster.getPhone());
         return masterRepository.findById(masterId).map(existingMaster -> {
             existingMaster.setName(newMaster.getName());
             existingMaster.setPhone(newMaster.getPhone());

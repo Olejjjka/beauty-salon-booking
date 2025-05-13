@@ -1,6 +1,7 @@
 package com.example.beauty_salon_booking.controllers;
 
 import com.example.beauty_salon_booking.dto.AppointmentDTO;
+import com.example.beauty_salon_booking.repositories.ClientRepository;
 import com.example.beauty_salon_booking.security.UserPrincipal;
 import com.example.beauty_salon_booking.services.AppointmentService;
 import org.slf4j.Logger;
@@ -38,15 +39,15 @@ public class DashboardController {
             return "redirect:/login";
         }
 
-        String username = user.getUsername();
-        model.addAttribute("username", username);
+        String name = user.getName();
+        model.addAttribute("username", name);
 
         try {
             Long clientId = user.getId();
             List<AppointmentDTO> records = appointmentService.getAppointmentsByClientId(clientId);
             model.addAttribute("records", records);
         } catch (Exception e) {
-            logger.warn("Failed to load appointments for user {}", username, e);
+            logger.warn("Failed to load appointments for user {}", name, e);
             model.addAttribute("records", List.of());
         }
 

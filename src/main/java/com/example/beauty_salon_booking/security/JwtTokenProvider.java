@@ -29,6 +29,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())                  // login
                 .claim("id", userPrincipal.getId())                    // id
+                .claim("name", userPrincipal.getName())                // имя
                 .claim("role", role)                                   // роль
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
@@ -59,10 +60,11 @@ public class JwtTokenProvider {
 
         Long id = claims.get("id", Integer.class).longValue();
         String login = claims.getSubject();
+        String name = claims.get("name", String.class);
         String roleStr = claims.get("role", String.class);
         Role role = Role.valueOf(roleStr);
 
-        UserPrincipal userPrincipal = new UserPrincipal(id, login, null, role);
+        UserPrincipal userPrincipal = new UserPrincipal(id, login, null, name, role);
 
         Collection<SimpleGrantedAuthority> authorities =
                 List.of(new SimpleGrantedAuthority("ROLE_" + roleStr));

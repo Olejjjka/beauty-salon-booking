@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
+import com.example.beauty_salon_booking.dto.ErrorResponseDTO;
 import com.example.beauty_salon_booking.dto.LoginRequestDTO;
 import com.example.beauty_salon_booking.dto.RegisterRequestDTO;
 import com.example.beauty_salon_booking.dto.TokenResponseDTO;
@@ -7,8 +8,10 @@ import com.example.beauty_salon_booking.services.RevokedTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
@@ -41,10 +44,13 @@ public class AuthPageController {
     }
 
     @PostMapping("/login")
-    public String handleLogin(@ModelAttribute LoginRequestDTO loginRequest,
+    public String handleLogin(@ModelAttribute("loginRequest") @Valid LoginRequestDTO loginRequest,
+                              BindingResult bindingResult,
                               HttpServletResponse response,
                               Model model) {
-
+        if (bindingResult.hasErrors()) {
+            return "login"; // Покажет ошибки валидации
+        }
 
         try {
             ResponseEntity<TokenResponseDTO> apiResponse = restTemplate.postForEntity(
@@ -69,7 +75,7 @@ public class AuthPageController {
             }
         } catch (Exception e) {
             logger.error("Login failed", e);
-            model.addAttribute("error", "Invalid username or password");
+            model.addAttribute("error", "Неверный логин или пароль");
             return "login";
         }
     }
@@ -81,22 +87,31 @@ public class AuthPageController {
     }
 
     @PostMapping("/register")
-    public String handleRegister(@ModelAttribute RegisterRequestDTO registerRequest, Model model) {
+    public String handleRegister(@ModelAttribute("registerRequest") @Valid RegisterRequestDTO registerRequest,
+                                 BindingResult bindingResult,
+                                 Model model) {
+        if (bindingResult.hasErrors()) {
+            return "register"; // Покажет ошибки валидации (например, пустые поля)
+        }
+
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(
+            ResponseEntity<ErrorResponseDTO> response = restTemplate.postForEntity(
                     "http://localhost:8080/api/auth/register/client",
                     registerRequest,
-                    String.class
+                    ErrorResponseDTO.class
             );
 
+            // Если регистрация успешна, редирект на страницу логина
             if (response.getStatusCode().is2xxSuccessful()) {
                 return "redirect:/login";
             } else {
-                model.addAttribute("error", "Error during registration: " + response.getBody());
+                // Ошибка с регистрацией (например, с API)
+                model.addAttribute("error", "Ошибка при регистрации");
                 return "register";
             }
         } catch (Exception e) {
-            model.addAttribute("error", "Error during registration");
+            logger.error("Registration failed", e);
+            model.addAttribute("error", "Ошибка при попытке регистрации. Проверьте введённые данные.");
             return "register";
         }
     }

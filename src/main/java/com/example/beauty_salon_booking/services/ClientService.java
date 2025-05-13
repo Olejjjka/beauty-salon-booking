@@ -50,7 +50,7 @@ public class ClientService {
     // без ограничений
     @Transactional
     public ClientDTO saveClient(Client client) {
-        userValidationService.validateLoginAndPhoneUniqueness(client.getLogin(), client.getPhone());
+        userValidationService.validateAll(client.getLogin(), client.getPassword(), client.getName(), client.getPhone());
         client.setPassword(passwordEncoder.encode(client.getPassword()));
         return dtoConverter.convertToClientDTO(clientRepository.save(client));
     }
@@ -84,16 +84,18 @@ public class ClientService {
 
         return clientRepository.findById(clientId).map(existingClient -> {
             if (updates.containsKey("name")) {
-                existingClient.setName((String) updates.get("name"));
+                String name = (String) updates.get("name");
+                userValidationService.validateName(name);
+                existingClient.setName(name);
             }
             if (updates.containsKey("phone")) {
                 String phone = (String) updates.get("phone");
-                userValidationService.validatePhoneUniqueness(phone);
+                userValidationService.validatePhone(phone);
                 existingClient.setPhone(phone);
             }
             if (updates.containsKey("login")) {
                 String login = (String) updates.get("login");
-                userValidationService.validateLoginUniqueness(login);
+                userValidationService.validateLogin(login);
                 existingClient.setLogin(login);
             }
             return dtoConverter.convertToClientDTO(clientRepository.save(existingClient));
@@ -112,6 +114,7 @@ public class ClientService {
             throw new RuntimeException("Current password is incorrect");
         }
 
+        userValidationService.validatePassword(newPassword);
         client.setPassword(passwordEncoder.encode(newPassword));
         clientRepository.save(client);
 
@@ -154,7 +157,7 @@ public class ClientService {
     @Transactional
     public Optional<ClientDTO> replaceClient(Long clientId, Client newClient) {
         authService.checkAccessToClient(clientId);
-        userValidationService.validateLoginAndPhoneUniqueness(newClient.getLogin(), newClient.getPhone());
+        userValidationService.validateAll(newClient.getLogin(), newClient.getPassword(), newClient.getName(), newClient.getPhone());
         return clientRepository.findById(clientId).map(existingClient -> {
             existingClient.setName(newClient.getName());
             existingClient.setPhone(newClient.getPhone());

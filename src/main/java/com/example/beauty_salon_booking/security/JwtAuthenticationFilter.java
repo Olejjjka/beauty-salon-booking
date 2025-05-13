@@ -1,5 +1,6 @@
 package com.example.beauty_salon_booking.security;
 
+import com.example.beauty_salon_booking.dto.ErrorResponseDTO;
 import com.example.beauty_salon_booking.services.RevokedTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -81,16 +82,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        // Подготовка объекта для вывода
-        HashMap<String, Object> responseBody = new HashMap<>();
-        responseBody.put("error", error);
-        responseBody.put("message", message);
-        responseBody.put("timestamp", LocalDateTime.now().toString());
-        responseBody.put("status", status);
+        // Создаем ErrorResponseDTO для стандартизированного ответа
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                LocalDateTime.now().toString(),
+                status,
+                message,
+                error
+        );
 
-        // Преобразование в JSON
+        // Преобразуем в JSON
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(responseBody);
+        String json = objectMapper.writeValueAsString(errorResponse);
 
         // Отправка ответа
         response.getWriter().write(json);

@@ -1,16 +1,180 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Регистрация</title></head>
+<head>
+    <title>Регистрация | Beauty Salon</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+
+        body {
+            background-color: #f7f1eb;
+            color: #5a5a5a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            color: #9ab4c8;
+            font-size: 32px;
+            letter-spacing: 3px;
+            font-weight: 300;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .logo-subtitle {
+            color: #c0b3a6;
+            font-size: 14px;
+            letter-spacing: 5px;
+            margin-top: -5px;
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e0e0e0;
+        }
+
+        .header h2 {
+            color: #a3cddc;
+            font-size: 26px;
+            margin-bottom: 6px;
+            font-weight: 300;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #6b6b6b;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #a3cddc;
+            outline: none;
+            background-color: #fff;
+        }
+
+        .form-group input::placeholder {
+            color: #bbb;
+        }
+
+        .btn-primary {
+            background-color: #b8d8e3;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #a3cddc;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .auth-link {
+            color: #a3cddc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
 <body>
-<h2>Регистрация</h2>
-<form th:action="@{/register}" th:object="${registerRequest}" method="post">
-    <input type="text" th:field="*{login}" placeholder="Логин"/>
-    <input type="password" th:field="*{password}" placeholder="Пароль"/>
-    <input type="text" th:field="*{name}" placeholder="Имя"/>
-    <input type="text" th:field="*{phone}" placeholder="Телефон"/>
-    <button type="submit">Зарегистрироваться</button>
-</form>
-<a href="/login">Уже есть аккаунт?</a>
+<div class="logo-container">
+    <div class="logo">Beauty Salon</div>
+    <div class="logo-subtitle">Искусство красоты</div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>Создайте аккаунт</h2>
+        <p class="subtitle">Присоединяйтесь к нашему салону красоты</p>
+    </div>
+
+    <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="auth-form">
+        <div class="form-group">
+            <label for="login">Логин</label>
+            <input type="text" id="login" th:field="*{login}" placeholder="Ваш логин" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" th:field="*{password}" placeholder="Не менее 6 символов" required>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Ваше имя</label>
+            <input type="text" id="name" th:field="*{name}" placeholder="Как к вам обращаться?" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Телефон</label>
+            <input type="tel" id="phone" th:field="*{phone}" placeholder="+7 (XXX) XXX-XX-XX" required>
+        </div>
+
+        <button type="submit" class="btn-primary">
+            <span class="btn-text">Зарегистрироваться</span>
+        </button>
+    </form>
+
+    <div class="auth-footer">
+        <p>Уже есть аккаунт? <a th:href="@{/login}" class="auth-link">Войти</a></p>
+    </div>
+</div>
 </body>
 </html>
-

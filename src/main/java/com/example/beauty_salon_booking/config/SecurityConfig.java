@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 
 
 @Configuration
@@ -37,18 +38,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-
+                .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Эндпоинты авторизации
-                        .requestMatchers("/api/auth/register/**").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/logout").authenticated()
+                        .requestMatchers("/", "/login", "/register", "/api/auth/**").permitAll()
+                        .requestMatchers("/css/**", "/images/**", "/favicon.ico").permitAll()
 
                         // CLIENT: доступ к просмотру мастеров и услуг
                         .requestMatchers(HttpMethod.GET, "/api/masters/*/appointments").hasRole("MASTER")
                         .requestMatchers(HttpMethod.GET, "/api/masters/**").hasAnyRole("CLIENT", "MASTER")
                         .requestMatchers(HttpMethod.GET, "/api/beauty-services/**").hasAnyRole("CLIENT", "MASTER")
                         .requestMatchers(HttpMethod.GET, "/api/appointments/**").hasAnyRole("CLIENT", "MASTER")
+
+                        ///
+                        .requestMatchers("/dashboard").hasAnyRole("CLIENT", "MASTER")
 
                         // CLIENT: доступ к своим данным
                         .requestMatchers("/api/clients/**").hasRole("CLIENT")
@@ -69,9 +72,14 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, revokedTokenService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenProvider, revokedTokenService);
     }
 
     @Bean
@@ -90,5 +98,10 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

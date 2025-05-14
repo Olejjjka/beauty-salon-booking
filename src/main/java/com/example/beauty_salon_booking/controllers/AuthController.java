@@ -1,8 +1,10 @@
 package com.example.beauty_salon_booking.controllers;
 
+import com.example.beauty_salon_booking.dto.ErrorResponseDTO;
 import com.example.beauty_salon_booking.dto.LoginRequestDTO;
 import com.example.beauty_salon_booking.dto.RegisterRequestDTO;
 import com.example.beauty_salon_booking.dto.TokenResponseDTO;
+import com.example.beauty_salon_booking.exceptions.ValidationException;
 import com.example.beauty_salon_booking.security.JwtTokenProvider;
 import com.example.beauty_salon_booking.services.ClientService;
 import com.example.beauty_salon_booking.services.MasterService;
@@ -14,6 +16,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -36,29 +40,63 @@ public class AuthController {
 
     // Регистрация клиента
     @PostMapping("/register/client")
-    public ResponseEntity<?> registerClient(@RequestBody RegisterRequestDTO registerRequest) {
-        clientService.saveClient(registerRequest.toClient());
-        return ResponseEntity.status(HttpStatus.CREATED).body("Client registered successfully");
+    public ResponseEntity<ErrorResponseDTO> registerClient(@RequestBody RegisterRequestDTO registerRequest) {
+        try {
+            clientService.saveClient(registerRequest.toClient());
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ErrorResponseDTO(
+                    LocalDateTime.now().toString(),
+                    HttpStatus.CREATED.value(),
+                    "Client registered successfully",
+                    "Success"
+            ));
+        } catch (ValidationException e) {
+            return ResponseEntity.badRequest().body(new ErrorResponseDTO(
+                    LocalDateTime.now().toString(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    "Validation error",
+                    e.getMessage()
+            ));
+        }
     }
 
     // Регистрация мастера
     @PostMapping("/register/master")
-    public ResponseEntity<?> registerMaster(@RequestBody RegisterRequestDTO registerRequest) {
-        masterService.saveMaster(registerRequest.toMaster());
-        return ResponseEntity.status(HttpStatus.CREATED).body("Master registered successfully");
+    public ResponseEntity<ErrorResponseDTO> registerMaster(@RequestBody RegisterRequestDTO registerRequest) {
+        try {
+            masterService.saveMaster(registerRequest.toMaster());
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ErrorResponseDTO(
+                    LocalDateTime.now().toString(),
+                    HttpStatus.CREATED.value(),
+                    "Master registered successfully",
+                    "Success"
+            ));
+        } catch (ValidationException e) {
+            return ResponseEntity.badRequest().body(new ErrorResponseDTO(
+                    LocalDateTime.now().toString(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    "Validation error",
+                    e.getMessage()
+            ));
+        }
     }
 
     // Вход и получение JWT
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDTO> authenticate(@RequestBody LoginRequestDTO loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword())
-        );
-        String token = jwtTokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new TokenResponseDTO(token));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword())
+            );
+            String token = jwtTokenProvider.generateToken(authentication);
+            return ResponseEntity.ok(new TokenResponseDTO(token));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenResponseDTO("Invalid credentials"));
+        }
     }
 
-    // Выход из системы и отзыв токена
+
+
+    // Не нужен (Выход из системы и отзыв токена)
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

@@ -3,11 +3,20 @@ package com.example.beauty_salon_booking.dto;
 import com.example.beauty_salon_booking.entities.Client;
 import com.example.beauty_salon_booking.entities.Master;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class RegisterRequestDTO {
 
+    @NotBlank(message = "Логин обязателен для заполнения")
     private String login;
+
+    @NotBlank(message = "Пароль обязателен для заполнения")
     private String password;
+
+    @NotBlank(message = "Имя обязательно для заполнения")
     private String name;
+
+    @NotBlank(message = "Телефон обязателен для заполнения")
     private String phone;
 
     public String getLogin() {
@@ -58,5 +67,16 @@ public class RegisterRequestDTO {
         master.setName(this.name);
         master.setPhone(this.phone);
         return master;
+    }
+
+    // не обязательно, но желательно для UI-связки
+
+    @Override
+    public String toString() {
+        return "RegisterRequestDTO{" +
+                "login='" + login + '\'' +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                '}';
     }
 }

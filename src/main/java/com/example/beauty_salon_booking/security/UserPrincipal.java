@@ -13,12 +13,14 @@ public class UserPrincipal implements UserDetails {
     private final Long id;
     private final String login;
     private final String password;
+    private final String name;
     private final Role role;
 
-    public UserPrincipal(Long id, String login, String password, Role role) {
+    public UserPrincipal(Long id, String login, String password, String name, Role role) {
         this.id = id;
         this.login = login;
         this.password = password;
+        this.name = name;
         this.role = role;
     }
 
@@ -34,11 +36,13 @@ public class UserPrincipal implements UserDetails {
     @Override public boolean isCredentialsNonExpired() { return true; }
     @Override public boolean isEnabled() { return true; }
 
-    public Role getRole() {
-        return role;
-    }
-
     public Long getId() {
         return id;
+    }
+
+    public String getName() { return name; }
+
+    public Role getRole() {
+        return role;
     }
 }

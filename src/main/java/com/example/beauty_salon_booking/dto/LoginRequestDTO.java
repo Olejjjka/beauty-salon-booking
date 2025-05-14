@@ -1,8 +1,12 @@
 package com.example.beauty_salon_booking.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginRequestDTO {
 
+    @NotBlank(message = "Логин обязателен для заполнения")
     private String login;
+    @NotBlank(message = "Пароль обязателен для заполнения")
     private String password;
 
     public String getLogin() {
@@ -19,5 +23,13 @@ public class LoginRequestDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    // не обязательно, но желательно для UI-связки
+    @Override
+    public String toString() {
+        return "LoginRequestDTO{" +
+                "login='" + login + '\'' +
+                '}';
     }
 }

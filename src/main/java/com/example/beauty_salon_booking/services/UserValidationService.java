@@ -21,7 +21,7 @@ public class UserValidationService {
 
     private void validateRequired(String field, String fieldName) {
         if (!StringUtils.hasText(field)) {
-            throw new ValidationException(fieldName + " must not be empty or just whitespace");
+            throw new ValidationException("Поле " + fieldName + " не должно быть пустым или содержать только пробелы");
         }
     }
 
@@ -32,25 +32,29 @@ public class UserValidationService {
                 || masterRepository.findByLogin(login).isPresent();
 
         if (loginTaken) {
-            throw new ValidationException("The user with this login has already been registered");
+            throw new ValidationException("Пользователь с таким логином уже зарегистрирован");
         }
     }
 
     public void validatePhone(String phone) {
-        if (!phone.matches("^\\+79\\d{9}$")) {
-            throw new ValidationException("The phone number must be in the format: +79*********");
+        if (!phone.matches("^\\+7\\d{10}$")) {
+            throw new ValidationException("Номер телефона должен быть в формате: +7(XXX)XXX-XX-XX");
         }
 
         boolean phoneTaken = clientRepository.findByPhone(phone).isPresent()
                 || masterRepository.findByPhone(phone).isPresent();
 
         if (phoneTaken) {
-            throw new ValidationException("The user with this phone has already been registered");
+            throw new ValidationException("Пользователь с таким телефоном уже зарегистрирован");
         }
     }
 
     public void validatePassword(String password) {
         validateRequired(password, "Password");
+
+        if (password.length() < 6) {
+            throw new ValidationException("Длина пароля должна составлять не менее 6 символов");
+        }
     }
 
     public void validateName(String name) {

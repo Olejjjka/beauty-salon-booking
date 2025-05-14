@@ -1,7 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
 import com.example.beauty_salon_booking.dto.AppointmentDTO;
-import com.example.beauty_salon_booking.repositories.ClientRepository;
 import com.example.beauty_salon_booking.security.UserPrincipal;
 import com.example.beauty_salon_booking.services.AppointmentService;
 import org.slf4j.Logger;

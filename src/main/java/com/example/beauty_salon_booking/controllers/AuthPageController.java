@@ -4,6 +4,7 @@ import com.example.beauty_salon_booking.dto.ErrorResponseDTO;
 import com.example.beauty_salon_booking.dto.LoginRequestDTO;
 import com.example.beauty_salon_booking.dto.RegisterRequestDTO;
 import com.example.beauty_salon_booking.dto.TokenResponseDTO;
+import com.example.beauty_salon_booking.exceptions.MessageExtractor;
 import com.example.beauty_salon_booking.services.RevokedTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AuthPageController {
@@ -47,9 +49,10 @@ public class AuthPageController {
     public String handleLogin(@ModelAttribute("loginRequest") @Valid LoginRequestDTO loginRequest,
                               BindingResult bindingResult,
                               HttpServletResponse response,
-                              Model model) {
+                              RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            return "login"; // Покажет ошибки валидации
+            redirectAttributes.addFlashAttribute("error", "Ошибка валидации");
+            return "redirect:/login";
         }
 
         try {
@@ -70,13 +73,13 @@ public class AuthPageController {
 
                 return "redirect:/dashboard";
             } else {
-                model.addAttribute("error", "Authorization error");
-                return "login";
+                redirectAttributes.addFlashAttribute("error", "Ошибка авторизации");
+                return "redirect:/login";
             }
         } catch (Exception e) {
             logger.error("Login failed", e);
-            model.addAttribute("error", "Неверный логин или пароль");
-            return "login";
+            redirectAttributes.addFlashAttribute("error", "Неверный логин или пароль");
+            return "redirect:/login";
         }
     }
 
@@ -89,9 +92,10 @@ public class AuthPageController {
     @PostMapping("/register")
     public String handleRegister(@ModelAttribute("registerRequest") @Valid RegisterRequestDTO registerRequest,
                                  BindingResult bindingResult,
-                                 Model model) {
+                                 RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            return "register"; // Покажет ошибки валидации (например, пустые поля)
+            redirectAttributes.addFlashAttribute("error", "Ошибка валидации");
+            return "redirect:/register";
         }
 
         try {
@@ -106,13 +110,13 @@ public class AuthPageController {
                 return "redirect:/login";
             } else {
                 // Ошибка с регистрацией (например, с API)
-                model.addAttribute("error", "Ошибка при регистрации");
-                return "register";
+                redirectAttributes.addFlashAttribute("error", "Ошибка при регистрации");
+                return "redirect:/register";
             }
         } catch (Exception e) {
             logger.error("Registration failed", e);
-            model.addAttribute("error", "Ошибка при попытке регистрации. Проверьте введённые данные.");
-            return "register";
+            redirectAttributes.addFlashAttribute("error", MessageExtractor.extractMessage(e.getMessage()));
+            return "redirect:/register";
         }
     }
 

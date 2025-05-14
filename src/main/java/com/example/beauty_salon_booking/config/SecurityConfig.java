@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Эндпоинты авторизации
                         .requestMatchers("/", "/login", "/register", "/api/auth/**").permitAll()
+                        .requestMatchers("/css/**", "/images/**", "/favicon.ico").permitAll()
 
                         // CLIENT: доступ к просмотру мастеров и услуг
                         .requestMatchers(HttpMethod.GET, "/api/masters/*/appointments").hasRole("MASTER")

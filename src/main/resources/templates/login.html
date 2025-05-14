@@ -1,186 +1,44 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Вход | Салон красоты</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Georgia', serif;
-        }
-
-        body {
-            background-color: #f7f1eb;
-            color: #5a5a5a;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .logo-container {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .logo {
-            color: #9ab4c8; /* Мягкий серо-голубой */
-            font-size: 32px;
-            letter-spacing: 3px;
-            font-weight: 300;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .logo-subtitle {
-            color: #c0b3a6; /* Бежево-серый */
-            font-size: 14px;
-            letter-spacing: 5px;
-            margin-top: -5px;
-        }
-
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 30px;
-            background-color: white;
-            border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e0e0e0;
-        }
-
-        h2 {
-            color: #a3cddc;
-            text-align: center;
-            margin-bottom: 25px;
-            font-weight: 300;
-            font-size: 28px;
-            letter-spacing: 1px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        div {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        label {
-            color: #6b6b6b;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        input {
-            padding: 14px 16px;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 15px;
-            background-color: #f9f9f9;
-            transition: border-color 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #a3cddc;
-            background-color: #fff;
-        }
-
-        button {
-            background-color: #b8d8e3;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-
-        button:hover {
-            background-color: #a3cddc;
-        }
-
-        .error {
-            color: #d4a5a5;
-            background-color: #fdf5f5;
-            padding: 10px 15px;
-            border-radius: 6px;
-            border: 1px solid #f0d8d8;
-            font-size: 14px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        a {
-            color: #a3cddc;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-
-        .header h2 {
-            color: #a3cddc;
-            font-size: 26px;
-            margin-bottom: 6px;
-            font-weight: 300;
-            text-align: center;
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 14px;
-            color: #666;
-        }
-
-    </style>
+    <link rel="stylesheet" th:href="@{/css/styleLogin.css}" href="/css/styleLogin.css">
 </head>
+
 <body>
-<div class="logo-container">
-    <div class="logo">Beauty Salon</div>
-    <div class="logo-subtitle">Искусство красоты</div>
-</div>
-
-<div class="container">
-
-    <div class="header">
-        <h2>Вход в систему</h2>
+    <div class="logo-container">
+        <div class="logo">Beauty Salon</div>
+        <div class="logo-subtitle">Искусство красоты</div>
     </div>
 
-    <!-- Блок отображения ошибки -->
-    <div th:if="${error}" class="error">
-        <p th:text="${error}"></p>
-    </div>
+    <div class="container">
 
-    <form th:action="@{/login}" th:object="${loginRequest}" method="post">
-        <div>
-            <label for="login">Логин:</label>
-            <input type="text" id="login" th:field="*{login}" placeholder="Введите логин" required/>
+        <div class="header">
+            <h2>Вход в систему</h2>
         </div>
-        <div>
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" th:field="*{password}" placeholder="Введите пароль" required/>
-        </div>
-        <button type="submit">Войти</button>
-    </form>
 
-    <div class="auth-footer">
-        <p>Нет аккаунта? <a th:href="@{/register}">Зарегистрируйтесь</a></p>
+        <!-- Блок отображения ошибки -->
+        <div th:if="${error}" class="error">
+            <p th:text="${error}"></p>
+        </div>
+
+        <form th:action="@{/login}" th:object="${loginRequest}" method="post">
+            <div>
+                <label for="login">Логин:</label>
+                <input type="text" id="login" th:field="*{login}" placeholder="Введите логин" required/>
+            </div>
+            <div>
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" th:field="*{password}" placeholder="Введите пароль" required/>
+            </div>
+            <button type="submit">Войти</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Нет аккаунта? <a th:href="@{/register}">Зарегистрируйтесь</a></p>
+        </div>
     </div>
-</div>
 </body>
 </html>

@@ -14,13 +14,15 @@ public class UserPrincipal implements UserDetails {
     private final String login;
     private final String password;
     private final String name;
+    private final String phone;
     private final Role role;
 
-    public UserPrincipal(Long id, String login, String password, String name, Role role) {
+    public UserPrincipal(Long id, String login, String password, String name, String phone, Role role) {
         this.id = id;
         this.login = login;
         this.password = password;
         this.name = name;
+        this.phone = phone;
         this.role = role;
     }
 
@@ -41,6 +43,7 @@ public class UserPrincipal implements UserDetails {
     }
 
     public String getName() { return name; }
+    public String getPhone() { return phone; }
 
     public Role getRole() {
         return role;

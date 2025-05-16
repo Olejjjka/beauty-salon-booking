@@ -27,12 +27,12 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         Client client = clientRepository.findByLogin(login).orElse(null);
         if (client != null) {
-            return new UserPrincipal(client.getId(), client.getLogin(), client.getPassword(), client.getName(), Role.CLIENT);
+            return new UserPrincipal(client.getId(), client.getLogin(), client.getPassword(), client.getName(), client.getPhone(), Role.CLIENT);
         }
 
         Master master = masterRepository.findByLogin(login).orElse(null);
         if (master != null) {
-            return new UserPrincipal(master.getId(), master.getLogin(), master.getPassword(), master.getName(), Role.MASTER);
+            return new UserPrincipal(master.getId(), master.getLogin(), master.getPassword(), master.getName(), master.getPhone(), Role.MASTER);
         }
 
         throw new UsernameNotFoundException("User with login '" + login + "' not found");

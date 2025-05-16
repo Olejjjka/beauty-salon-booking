@@ -1,8 +1,10 @@
 package com.example.beauty_salon_booking.services;
 
 import com.example.beauty_salon_booking.dto.*;
+import com.example.beauty_salon_booking.entities.Appointment;
 import com.example.beauty_salon_booking.entities.Master;
 import com.example.beauty_salon_booking.entities.BeautyService;
+import com.example.beauty_salon_booking.enums.AppointmentStatus;
 import com.example.beauty_salon_booking.repositories.AppointmentRepository;
 import com.example.beauty_salon_booking.repositories.MasterRepository;
 import com.example.beauty_salon_booking.repositories.BeautyServiceRepository;
@@ -211,29 +213,37 @@ public class MasterService {
         return dtoConverter.convertToMasterDTO(masterRepository.save(master));
     }
 
+    @Transactional
+    public void updateAppointmentStatus(Long appointmentId, String status) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Запись не найдена"));
+
+        authService.checkAccessFromMasterToAppointment(appointment);
+
+        AppointmentStatus newStatus = AppointmentStatus.valueOf(status);
+        appointment.setStatus(newStatus);
+        appointmentRepository.save(appointment);
+    }
+
     // для причастного мастера
     @Transactional
-    public Optional<MasterDTO> updateMaster(Long masterId, Map<String, Object> updates) {
+    public void updateMaster(Long masterId, Map<String, Object> updates) {
         authService.checkAccessToMaster(masterId);
 
-        return masterRepository.findById(masterId).map(existingMaster -> {
-            if (updates.containsKey("name")) {
-                String name = (String) updates.get("name");
-                userValidationService.validateName(name);
-                existingMaster.setName(name);
-            }
-            if (updates.containsKey("phone")) {
-                String phone = (String) updates.get("phone");
-                userValidationService.validatePhone(phone);
-                existingMaster.setPhone(phone);
-            }
-            if (updates.containsKey("login")) {
-                String login = (String) updates.get("login");
-                userValidationService.validateLogin(login);
-                existingMaster.setLogin((String) updates.get("login"));
-            }
-            return dtoConverter.convertToMasterDTO(masterRepository.save(existingMaster));
-        });
+        Master master = masterRepository.findById(masterId)
+                .orElseThrow(() -> new EntityNotFoundException("Мастер не найден"));
+
+        if (updates.containsKey("username")) {
+            master.setName((String) updates.get("username"));
+        }
+        if (updates.containsKey("phone")) {
+            master.setPhone((String) updates.get("phone"));
+        }
+        if (updates.containsKey("login")) {
+            master.setLogin((String) updates.get("login"));
+        }
+
+        masterRepository.save(master);
     }
 
     // для причастного мастера

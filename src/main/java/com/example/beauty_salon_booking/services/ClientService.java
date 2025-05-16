@@ -4,6 +4,7 @@ import com.example.beauty_salon_booking.dto.AppointmentDTO;
 import com.example.beauty_salon_booking.dto.ClientDTO;
 import com.example.beauty_salon_booking.dto.DTOConverter;
 import com.example.beauty_salon_booking.entities.Client;
+import com.example.beauty_salon_booking.entities.Master;
 import com.example.beauty_salon_booking.repositories.AppointmentRepository;
 import com.example.beauty_salon_booking.repositories.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -79,27 +80,23 @@ public class ClientService {
 
     // для причастного клиента
     @Transactional
-    public Optional<ClientDTO> updateClient(Long clientId, Map<String, Object> updates) {
+    public void updateClient(Long clientId, Map<String, Object> updates) {
         authService.checkAccessToClient(clientId);
 
-        return clientRepository.findById(clientId).map(existingClient -> {
-            if (updates.containsKey("name")) {
-                String name = (String) updates.get("name");
-                userValidationService.validateName(name);
-                existingClient.setName(name);
-            }
-            if (updates.containsKey("phone")) {
-                String phone = (String) updates.get("phone");
-                userValidationService.validatePhone(phone);
-                existingClient.setPhone(phone);
-            }
-            if (updates.containsKey("login")) {
-                String login = (String) updates.get("login");
-                userValidationService.validateLogin(login);
-                existingClient.setLogin(login);
-            }
-            return dtoConverter.convertToClientDTO(clientRepository.save(existingClient));
-        });
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new EntityNotFoundException("Клиент не найден"));
+
+        if (updates.containsKey("username")) {
+            client.setName((String) updates.get("username"));
+        }
+        if (updates.containsKey("phone")) {
+            client.setPhone((String) updates.get("phone"));
+        }
+        if (updates.containsKey("login")) {
+            client.setLogin((String) updates.get("login"));
+        }
+
+        clientRepository.save(client);
     }
 
     // для причастного клиента

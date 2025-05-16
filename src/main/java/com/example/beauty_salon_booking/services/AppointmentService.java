@@ -114,14 +114,10 @@ public class AppointmentService {
 
     // для всех клиентов
     @Transactional
-    public AppointmentDTO createAppointment(Map<String, Object> payload) {
+    public AppointmentDTO createAppointment(Long masterId, Long  beautyServiceId, LocalDate date, LocalTime time) {//Map<String, Object> payload) {
         Long clientId = authService.getCurrentUserId();
         authService.checkAccessToClient(clientId);
 
-        Long masterId = ((Number) payload.get("masterId")).longValue();
-        Long beautyServiceId = ((Number) payload.get("beautyServiceId")).longValue();
-        LocalDate date = LocalDate.parse((String) payload.get("date"));
-        LocalTime time = LocalTime.parse((String) payload.get("time"));
         AppointmentStatus status = AppointmentStatus.PENDING;
 
         Appointment appointment = new Appointment();

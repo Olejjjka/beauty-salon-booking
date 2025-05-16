@@ -84,10 +84,10 @@ public class AppointmentController {
     }
 
     // для всех клиентов
-    @PostMapping("/create")
-    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> payload) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(payload));
-    }
+    //@PostMapping("/create")
+    //public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> payload) {
+    //    return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(payload));
+    //}
 
     // для причастного мастера, который связан с конкретной записью
     @PutMapping("/{appointmentId}")

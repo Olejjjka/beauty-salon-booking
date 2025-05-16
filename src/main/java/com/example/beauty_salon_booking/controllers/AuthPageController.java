@@ -71,7 +71,7 @@ public class AuthPageController {
                 cookie.setMaxAge(60 * 60);
                 response.addCookie(cookie);
 
-                return "redirect:/dashboard";
+                return "redirect:/homepage";
             } else {
                 redirectAttributes.addFlashAttribute("error", "Ошибка авторизации");
                 return "redirect:/login";
@@ -118,6 +118,16 @@ public class AuthPageController {
             redirectAttributes.addFlashAttribute("error", MessageExtractor.extractMessage(e.getMessage()));
             return "redirect:/register";
         }
+    }
+
+    @GetMapping("/homepage")
+    public String showHomepage() {
+        return "homepage";
+    }
+
+    @GetMapping("/appointments")
+    public String showAppointments() {
+        return "appointments";
     }
 
     @GetMapping("/logout")

@@ -90,12 +90,12 @@ public class MasterController {
     }
 
     // для причастного мастера
-    @PatchMapping("/{masterId}")
-    public ResponseEntity<MasterDTO> updateMaster(@PathVariable Long masterId, @RequestBody Map<String, Object> updates) {
-        return masterService.updateMaster(masterId, updates)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+    //@PatchMapping("/{masterId}")
+    //public ResponseEntity<MasterDTO> updateMaster(@PathVariable Long masterId, @RequestBody Map<String, Object> updates) {
+    //    return masterService.updateMaster(masterId, updates)
+    //            .map(ResponseEntity::ok)
+    //            .orElse(ResponseEntity.notFound().build());
+    //}
 
     // для причастного мастера
     @PostMapping("/{masterId}/change-password")

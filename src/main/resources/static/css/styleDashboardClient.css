@@ -1,0 +1,173 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Georgia', serif;
+}
+
+body {
+    background-color: #f7f1eb;
+    color: #5a5a5a;
+    min-height: 100vh;
+    padding: 20px;
+    line-height: 1.6;
+    position: relative;
+}
+
+/* Шапка */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    color: #9ab4c8;
+    font-size: 32px;
+    letter-spacing: 3px;
+    font-weight: 300;
+    text-transform: uppercase;
+}
+
+.logout-btn {
+    background-color: transparent;
+    color: #9a8c84;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    border: 1px solid #e0d6d0;
+}
+
+.logout-btn:hover {
+    background-color: #f0e6e0;
+    color: #7a6c64;
+}
+
+.home-btn {
+    background-color: transparent;
+    color: #9a8c84;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    border: 1px solid #e0d6d0;
+
+}
+
+.home-btn:hover {
+    background-color: #f0e6e0;
+    color: #7a6c64;
+}
+
+/* Основной контейнер */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: white;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e0e0e0;
+    min-height: 60vh;
+}
+
+h2 {
+    color: #a3cddc;
+    font-weight: 300;
+    font-size: 26px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+/* Блок с пользователем */
+.user-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    background-color: #e0e8f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: #9ab4c8;
+    font-size: 22px;
+}
+
+.user-name {
+    font-size: 18px;
+    color: #7a8b99;
+    font-weight: 500;
+}
+
+h3 {
+    color: #7a8b99;
+    font-weight: 300;
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+/* Стили для записей */
+.records-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.record-card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #b8d8e3;
+    transition: all 0.3s;
+}
+
+.record-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.record-field {
+    margin-bottom: 8px;
+}
+
+.record-field strong {
+    color: #7a8b99;
+    font-weight: 500;
+    display: inline-block;
+    width: 80px;
+}
+
+.no-records {
+    color: #c0b3a6;
+    font-style: italic;
+    text-align: center;
+    padding: 40px;
+    grid-column: 1 / -1;
+}
+
+/* Заглушка для будущего контента */
+.content-placeholder {
+    height: 200px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ab4c8;
+    margin-top: 30px;
+    border: 1px dashed #e0e0e0;
+}

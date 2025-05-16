@@ -44,12 +44,12 @@ public class ClientController {
     }
 
     // для причастного клиента
-    @PatchMapping("/{clientId}")
-    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long clientId, @RequestBody Map<String, Object> updates) {
-        return clientService.updateClient(clientId, updates)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+    //@PatchMapping("/{clientId}")
+    //public ResponseEntity<ClientDTO> updateClient(@PathVariable Long clientId, @RequestBody Map<String, Object> updates) {
+    //    return clientService.updateClient(clientId, updates)
+    //            .map(ResponseEntity::ok)
+    //            .orElse(ResponseEntity.notFound().build());
+    //}
 
     // для причастного клиента
     @PostMapping("/{clientId}/change-password")

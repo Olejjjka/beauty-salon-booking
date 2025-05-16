@@ -35,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (request.getRequestURI().startsWith("/register") ||
             request.getRequestURI().startsWith("/api/auth/register") ||
             request.getRequestURI().startsWith("/login") ||
+            request.getRequestURI().startsWith("/appointments") ||
             request.getRequestURI().startsWith("/api/auth/login") ||
             request.getRequestURI().startsWith("/css/") ||
             request.getRequestURI().startsWith("/images/") ||

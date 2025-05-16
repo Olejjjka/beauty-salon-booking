@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Эндпоинты авторизации
-                        .requestMatchers("/", "/login", "/register", "/api/auth/**").permitAll()
+                        .requestMatchers("/", "/login", "/register", "/appointments", "/api/auth/**").permitAll()
                         .requestMatchers("/css/**", "/images/**", "/favicon.ico").permitAll()
 
                         // CLIENT: доступ к просмотру мастеров и услуг

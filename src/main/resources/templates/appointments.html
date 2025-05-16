@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Запись на услугу</title>
+    <link rel="stylesheet" th:href="@{/css/styleAppointment.css}" href="/css/styleAppointment.css">
+</head>
+<body>
+<h1>Запись на услугу</h1>
+
+<form th:action="@{/appointments/select}" method="post">
+    <!-- Шаг 1: выбор услуги -->
+    <label>Услуга:</label>
+    <select name="beautyServiceId" required>
+        <option value="">-- выберите --</option>
+        <option th:each="service : ${services}"
+                th:value="${service.id}"
+                th:text="${service.name}"
+                th:selected="${selectedServiceId} == ${service.id}">
+        </option>
+    </select>
+    <button type="submit">Выбрать</button>
+</form>
+
+<!-- Шаг 2: выбор мастера (если услуга выбрана) -->
+<div th:if="${selectedServiceId != null}">
+    <form th:action="@{/appointments/select}" method="post">
+        <input type="hidden" name="beautyServiceId" th:value="${selectedServiceId}"/>
+        <label>Мастер:</label>
+        <select name="masterId" required>
+            <option value="">-- выберите --</option>
+            <option th:each="master : ${masters}"
+                    th:value="${master.id}"
+                    th:text="${master.name}"
+                    th:selected="${selectedMasterId} == ${master.id}">
+            </option>
+        </select>
+        <button type="submit">Выбрать</button>
+    </form>
+</div>
+
+<!-- Шаг 3: выбор даты и времени -->
+<div th:if="${selectedMasterId != null}">
+    <form th:action="@{/appointments/confirm}" method="post">
+        <input type="hidden" name="beautyServiceId" th:value="${selectedServiceId}"/>
+        <input type="hidden" name="masterId" th:value="${selectedMasterId}"/>
+
+
+        <label>Дата:</label>
+        <select id="date-select" name="date" th:field="*{date}" required>
+            <option th:each="entry : ${availableDates}"
+                    th:value="${entry.key}"
+                    th:text="${entry.key}">
+            </option>
+        </select>
+
+        <label>Время:</label>
+        <select name="time" required>
+            <option th:each="slot : ${availableDates[selectedDate]}"
+                    th:value="${slot.start}"
+                    th:text="${slot.start} + ' - ' + ${slot.end}">
+            </option>
+        </select>
+
+        <button type="submit">Записаться</button>
+    </form>
+</div>
+
+<div th:if="${successMessage != null}">
+    <p th:text="${successMessage}" style="color: green;"></p>
+</div>
+
+</body>
+</html>

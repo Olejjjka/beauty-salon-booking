@@ -1,0 +1,74 @@
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group, .calendar-time-wrapper {
+    margin-bottom: 20px;
+}
+
+select, button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.time-slot-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.time-slot {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.time-slot.selected {
+    background-color: #40e0d0;
+    color: white;
+}
+
+.time-slot.disabled {
+    background-color: #eee;
+    color: #aaa;
+    pointer-events: none;
+}
+
+.calendar-day {
+    display: inline-block;
+    width: 30px;
+    text-align: center;
+    margin: 2px;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.calendar-day.available {
+    color: black;
+}
+
+.calendar-day.selected {
+    background-color: #40e0d0;
+    color: white;
+}
+
+.calendar-day.unavailable {
+    color: lightgray;
+    pointer-events: none;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: green;
+}
+
+.hidden {
+    display: none;
+}

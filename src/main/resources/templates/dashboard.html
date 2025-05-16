@@ -14,7 +14,10 @@
         <!-- Шапка с лого и кнопкой выхода -->
         <div class="header">
             <div class="logo">Beauty Salon</div>
-            <a th:href="@{/logout}" class="logout-btn">Выйти</a>
+            <div class="button-group">
+                <a th:href="@{/homepage}" class="home-btn">На главную</a>
+                <a th:href="@{/logout}" class="logout-btn">Выйти</a>
+            </div>
         </div>
 
         <h2>Личный кабинет</h2>

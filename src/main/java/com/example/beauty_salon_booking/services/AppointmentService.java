@@ -72,6 +72,22 @@ public class AppointmentService {
                 });
     }
 
+    // для причастного клиента, который связан с конкретной записью
+    public List<AppointmentDTO> getAppointmentsByClientId(Long clientId) {
+        return appointmentRepository.findByClientId(clientId).stream()
+                .peek(authService::checkAccessFromClientToAppointment) // Проверка доступа для каждого объекта
+                .map(dtoConverter::convertToAppointmentDTO)
+                .toList();
+    }
+
+    // для причастного мастера, который связан с конкретной записью
+    public List<AppointmentDTO> getAppointmentsByMasterId(Long masterId) {
+        return appointmentRepository.findByMasterId(masterId).stream()
+                .peek(authService::checkAccessFromMasterToAppointment) // Проверка доступа для каждого объекта
+                .map(dtoConverter::convertToAppointmentDTO)
+                .toList();
+    }
+
     // для причастных клиента и мастера, которые связаны с конкретной записью
     public List<AppointmentDTO> getAppointmentsByBeautyServiceId(Long beautyServiceId) {
         return appointmentRepository.findByBeautyServiceId(beautyServiceId).stream()
@@ -180,22 +196,6 @@ public class AppointmentService {
     }
 
 
-
-    // не надо (для причастного клиента, который связан с конкретной записью)
-    public List<AppointmentDTO> getAppointmentsByClientId(Long clientId) {
-        return appointmentRepository.findByClientId(clientId).stream()
-                .peek(authService::checkAccessFromClientToAppointment) // Проверка доступа для каждого объекта
-                .map(dtoConverter::convertToAppointmentDTO)
-                .toList();
-    }
-
-    // не надо (для причастного мастера, который связан с конкретной записью)
-    public List<AppointmentDTO> getAppointmentsByMasterId(Long masterId) {
-        return appointmentRepository.findByMasterId(masterId).stream()
-                .peek(authService::checkAccessFromMasterToAppointment) // Проверка доступа для каждого объекта
-                .map(dtoConverter::convertToAppointmentDTO)
-                .toList();
-    }
 
     // не надо
     public List<AppointmentDTO> getAllAppointments() {

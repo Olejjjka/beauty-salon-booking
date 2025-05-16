@@ -17,7 +17,6 @@ import java.util.List;
 public class DashboardController {
 
     private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
-
     private final AppointmentService appointmentService;
 
     public DashboardController(AppointmentService appointmentService) {

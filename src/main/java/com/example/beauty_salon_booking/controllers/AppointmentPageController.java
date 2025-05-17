@@ -59,9 +59,7 @@ public class AppointmentPageController {
                                       @RequestParam(required = false) Long masterId,
                                       @RequestParam(required = false) String selectedDate,
                                       Model model,
-                                      RedirectAttributes redirectAttributes,
-                                      @ModelAttribute("successMessage") String successMessage,
-                                      @ModelAttribute("errorMessage") String errorMessage) {
+                                      RedirectAttributes redirectAttributes) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

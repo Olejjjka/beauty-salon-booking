@@ -21,14 +21,6 @@
 
     <div class="appointment-container">
 
-        <!-- Сообщения об успехе/ошибке -->
-        <div th:if="${successMessage}" style="color: green;">
-            <p th:text="${successMessage}"></p>
-        </div>
-        <div th:if="${errorMessage}" style="color: red;">
-            <p th:text="${errorMessage}"></p>
-        </div>
-
         <!-- Шаг 1: Выбор услуги -->
         <form th:action="@{/appointment/select}" method="post">
             <label>Услуга:</label>
@@ -68,10 +60,10 @@
                 <label>Дата:</label>
                 <select name="selectedDate" required>
                     <option value="">-- выберите --</option>
-                    <option th:each="entry : ${availableDates}"
-                            th:value="${entry.key}"
-                            th:text="${entry.key}"
-                            th:selected="${selectedDate} == ${entry.key}">
+                    <option th:each="date : ${availableDates}"
+                            th:value="${date.key}"
+                            th:text="${date.key}"
+                            th:selected="${selectedDate} == ${date.key}">
                     </option>
                 </select>
                 <button type="submit">Выбрать</button>

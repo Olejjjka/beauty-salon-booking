@@ -114,7 +114,7 @@ public class AppointmentService {
 
     // для всех клиентов
     @Transactional
-    public AppointmentDTO createAppointment(Long  beautyServiceId, Long masterId, LocalDate date, LocalTime time) {
+    public AppointmentDTO createAppointment(Long beautyServiceId, Long masterId, LocalDate date, LocalTime time) {
         Long clientId = authService.getCurrentUserId();
         authService.checkAccessToClient(clientId);
 

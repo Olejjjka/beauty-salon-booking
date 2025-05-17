@@ -93,8 +93,8 @@ public class AppointmentPageController {
             }
         }
 
-        model.addAttribute("successMessage", successMessage);
-        model.addAttribute("errorMessage", errorMessage);
+        //model.addAttribute("successMessage", successMessage);
+        //model.addAttribute("errorMessage", errorMessage);
 
         return "appointment";
     }

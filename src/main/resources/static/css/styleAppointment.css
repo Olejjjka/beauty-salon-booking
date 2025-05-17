@@ -72,3 +72,52 @@ select, button {
 .hidden {
     display: none;
 }
+
+/* Шапка */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    color: #9ab4c8;
+    font-size: 32px;
+    letter-spacing: 3px;
+    font-weight: 300;
+    text-transform: uppercase;
+}
+
+.dashboard-btn {
+    background-color: transparent;
+    color: #9a8c84;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    border: 1px solid #e0d6d0;
+}
+
+.dashboard-btn:hover {
+    background-color: #f0e6e0;
+    color: #7a6c64;
+}
+
+.home-btn {
+    background-color: transparent;
+    color: #9a8c84;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    border: 1px solid #e0d6d0;
+
+}
+
+.home-btn:hover {
+    background-color: #f0e6e0;
+    color: #7a6c64;
+}

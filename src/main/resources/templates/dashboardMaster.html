@@ -7,7 +7,7 @@
     <title>Личный кабинет | Beauty Salon</title>
 
     <!-- Основные стили -->
-    <link rel="stylesheet" th:href="@{/css/styleDashboardMaster.css}" href="/css/styleDashboardMaster.css" />
+    <link rel="stylesheet" th:href="@{/css/styleDashboard.css}" href="/css/styleDashboard.css" />
     <!-- Стили вкладок -->
     <link rel="stylesheet" th:href="@{/css/styleTabs.css}" href="/css/styleTabs.css" />
     <!-- Иконки FontAwesome -->
@@ -19,7 +19,10 @@
         <!-- Шапка -->
         <div class="header">
             <div class="logo">Beauty Salon</div>
-            <a th:href="@{/logout}" class="logout-btn">Выйти</a>
+            <div class="button-group">
+                <a th:href="@{/homepage}" class="home-btn">На главную</a>
+                <a th:href="@{/logout}" class="logout-btn">Выйти</a>
+            </div>
         </div>
 
         <h2>Личный кабинет</h2>
@@ -65,14 +68,18 @@
                         <p th:text="${warning}"></p>
                     </div>
 
-                    <form th:action="@{/dashboard/master/update-profile}" method="post">
-                        <input type="hidden" name="masterId" th:value="${masterId}" />
-                        <label>Имя:</label>
-                        <input type="text" name="name" placeholder="Новое имя"/>
-                        <label>Телефон:</label>
-                        <input type="text" name="phone" placeholder="Новый телефон"/>
-                        <label>Логин:</label>
-                        <input type="text" name="login" placeholder="Новый логин"/>
+                    <form th:action="@{/dashboard/client/update-profile}" method="post" class="profile-form">
+                        <input type="hidden" name="clientId" th:value="${clientId}" />
+
+                        <label for="name">Имя:</label>
+                        <input type="text" id="name" name="name" placeholder="Новое имя" />
+
+                        <label for="phone">Телефон:</label>
+                        <input type="text" id="phone" name="phone" placeholder="Новый телефон" />
+
+                        <label for="login">Логин:</label>
+                        <input type="text" id="login" name="login" placeholder="Новый логин" />
+
                         <button type="submit">Обновить профиль</button>
                     </form>
 
@@ -82,12 +89,15 @@
                         <p th:text="${error}"></p>
                     </div>
 
-                    <form th:action="@{/dashboard/master/change-password}" method="post">
-                        <input type="hidden" name="masterId" th:value="${masterId}" />
-                        <label>Старый пароль:</label>
-                        <input type="password" name="oldPassword" placeholder="Текущий пароль" required />
-                        <label>Новый пароль:</label>
-                        <input type="password" name="newPassword" placeholder="Новый пароль" required />
+                    <form th:action="@{/dashboard/client/change-password}" method="post">
+                        <input type="hidden" name="clientId" th:value="${clientId}" />
+
+                        <label for="oldPassword">Старый пароль:</label>
+                        <input type="password" id="oldPassword" name="oldPassword" placeholder="Текущий пароль" required />
+
+                        <label for="newPassword">Новый пароль:</label>
+                        <input type="password" id="newPassword" name="newPassword" placeholder="Новый пароль" required />
+
                         <button type="submit">Сменить пароль</button>
                     </form>
                 </div>

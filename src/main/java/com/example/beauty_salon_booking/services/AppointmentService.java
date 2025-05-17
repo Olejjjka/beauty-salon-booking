@@ -114,7 +114,7 @@ public class AppointmentService {
 
     // для всех клиентов
     @Transactional
-    public AppointmentDTO createAppointment(Long masterId, Long  beautyServiceId, LocalDate date, LocalTime time) {//Map<String, Object> payload) {
+    public AppointmentDTO createAppointment(Long  beautyServiceId, Long masterId, LocalDate date, LocalTime time) {
         Long clientId = authService.getCurrentUserId();
         authService.checkAccessToClient(clientId);
 
@@ -123,10 +123,10 @@ public class AppointmentService {
         Appointment appointment = new Appointment();
         appointment.setClient(clientRepository.findById(clientId)
                 .orElseThrow(() -> new EntityNotFoundException("Client not found")));
-        appointment.setMaster(masterRepository.findById(masterId)
-                .orElseThrow(() -> new EntityNotFoundException ("Master not found")));
         appointment.setBeautyService(beautyServiceRepository.findById(beautyServiceId)
                 .orElseThrow(() -> new EntityNotFoundException ("Beauty Service not found")));
+        appointment.setMaster(masterRepository.findById(masterId)
+                .orElseThrow(() -> new EntityNotFoundException ("Master not found")));
         appointment.setDate(date);
         appointment.setTime(time);
         appointment.setStatus(status);

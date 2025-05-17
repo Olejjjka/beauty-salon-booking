@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
@@ -47,13 +46,8 @@ public class AuthPageController {
 
     @PostMapping("/login")
     public String handleLogin(@ModelAttribute("loginRequest") @Valid LoginRequestDTO loginRequest,
-                              BindingResult bindingResult,
                               HttpServletResponse response,
                               RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", "Ошибка валидации");
-            return "redirect:/login";
-        }
 
         try {
             ResponseEntity<TokenResponseDTO> apiResponse = restTemplate.postForEntity(
@@ -91,13 +85,7 @@ public class AuthPageController {
 
     @PostMapping("/register")
     public String handleRegister(@ModelAttribute("registerRequest") @Valid RegisterRequestDTO registerRequest,
-                                 BindingResult bindingResult,
                                  RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", "Ошибка валидации");
-            return "redirect:/register";
-        }
-
         try {
             ResponseEntity<ErrorResponseDTO> response = restTemplate.postForEntity(
                     "http://localhost:8080/api/auth/register/client",
@@ -125,9 +113,9 @@ public class AuthPageController {
         return "homepage";
     }
 
-    @GetMapping("/appointments")
+    @GetMapping("/appointment")
     public String showAppointments() {
-        return "appointments";
+        return "appointment";
     }
 
     @GetMapping("/logout")

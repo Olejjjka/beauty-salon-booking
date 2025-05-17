@@ -34,6 +34,11 @@ public class AppointmentPageController {
         this.appointmentService = appointmentService;
     }
 
+    @GetMapping("/")
+    public String select() {
+        return "redirect:/appointment/select";
+    }
+
     @PostMapping("/select")
     public String processSelection(@RequestParam Long beautyServiceId,
                                    @RequestParam(required = false) Long masterId,
@@ -92,10 +97,6 @@ public class AppointmentPageController {
                 }
             }
         }
-
-        //model.addAttribute("successMessage", successMessage);
-        //model.addAttribute("errorMessage", errorMessage);
-
         return "appointment";
     }
 
@@ -118,5 +119,4 @@ public class AppointmentPageController {
             return "redirect:/appointment/select";
         }
     }
-
 }

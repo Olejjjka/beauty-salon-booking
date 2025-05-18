@@ -34,7 +34,7 @@ public class AppointmentPageController {
         this.appointmentService = appointmentService;
     }
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public String select() {
         return "redirect:/appointment/select";
     }

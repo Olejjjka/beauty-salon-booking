@@ -32,7 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         // Пропускаем проверку для эндпоинтов авторизации
-        if (request.getRequestURI().startsWith("/register") ||
+        if (request.getRequestURI().equals("/") ||
+            request.getRequestURI().startsWith("/register") ||
             request.getRequestURI().startsWith("/api/auth/register") ||
             request.getRequestURI().startsWith("/login") ||
             request.getRequestURI().startsWith("/api/auth/login") ||

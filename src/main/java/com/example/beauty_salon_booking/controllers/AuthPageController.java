@@ -33,7 +33,7 @@ public class AuthPageController {
         this.revokedTokenService = revokedTokenService;
     }
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public String home() {
         return "redirect:/login";
     }
@@ -111,11 +111,6 @@ public class AuthPageController {
     @GetMapping("/homepage")
     public String showHomepage() {
         return "homepage";
-    }
-
-    @GetMapping("/appointment")
-    public String showAppointments() {
-        return "appointment";
     }
 
     @GetMapping("/logout")

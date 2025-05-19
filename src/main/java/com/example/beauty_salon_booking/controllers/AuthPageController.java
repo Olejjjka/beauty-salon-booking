@@ -1,36 +1,34 @@
 package com.example.beauty_salon_booking.controllers;
 
-import com.example.beauty_salon_booking.dto.ErrorResponseDTO;
+import com.example.beauty_salon_booking.dto.ResponseDTO;
 import com.example.beauty_salon_booking.dto.LoginRequestDTO;
 import com.example.beauty_salon_booking.dto.RegisterRequestDTO;
 import com.example.beauty_salon_booking.dto.TokenResponseDTO;
 import com.example.beauty_salon_booking.exceptions.MessageExtractor;
-import com.example.beauty_salon_booking.services.RevokedTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+
 
 @Controller
 public class AuthPageController {
-
     private static final Logger logger = LoggerFactory.getLogger(AuthPageController.class);
     private final RestTemplate restTemplate;
-    private final RevokedTokenService revokedTokenService;
 
-    public AuthPageController(RestTemplate restTemplate,
-                              RevokedTokenService revokedTokenService) {
+    public AuthPageController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        this.revokedTokenService = revokedTokenService;
     }
 
     @GetMapping({"", "/"})
@@ -48,7 +46,6 @@ public class AuthPageController {
     public String handleLogin(@ModelAttribute("loginRequest") @Valid LoginRequestDTO loginRequest,
                               HttpServletResponse response,
                               RedirectAttributes redirectAttributes) {
-
         try {
             ResponseEntity<TokenResponseDTO> apiResponse = restTemplate.postForEntity(
                     "http://localhost:8080/api/auth/login",
@@ -56,7 +53,10 @@ public class AuthPageController {
                     TokenResponseDTO.class
             );
 
-            if (apiResponse.getStatusCode().is2xxSuccessful() && apiResponse.getBody() != null) {
+            if (apiResponse.getStatusCode().is2xxSuccessful() &&
+                    apiResponse.getBody() != null &&
+                    apiResponse.getBody().getToken() != null) {
+
                 String jwtToken = apiResponse.getBody().getToken();
 
                 Cookie cookie = new Cookie("jwt", jwtToken);
@@ -71,11 +71,11 @@ public class AuthPageController {
                 return "redirect:/login";
             }
         } catch (Exception e) {
-            logger.error("Login failed", e);
             redirectAttributes.addFlashAttribute("error", "Неверный логин или пароль");
             return "redirect:/login";
         }
     }
+
 
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
@@ -87,14 +87,15 @@ public class AuthPageController {
     public String handleRegister(@ModelAttribute("registerRequest") @Valid RegisterRequestDTO registerRequest,
                                  RedirectAttributes redirectAttributes) {
         try {
-            ResponseEntity<ErrorResponseDTO> response = restTemplate.postForEntity(
+            ResponseEntity<ResponseDTO> response = restTemplate.postForEntity(
                     "http://localhost:8080/api/auth/register/client",
                     registerRequest,
-                    ErrorResponseDTO.class
+                    ResponseDTO.class
             );
 
             // Если регистрация успешна, редирект на страницу логина
             if (response.getStatusCode().is2xxSuccessful()) {
+                redirectAttributes.addFlashAttribute("success", "Регистрация прошла успешно");
                 return "redirect:/login";
             } else {
                 // Ошибка с регистрацией (например, с API)
@@ -102,7 +103,7 @@ public class AuthPageController {
                 return "redirect:/register";
             }
         } catch (Exception e) {
-            logger.error("Registration failed", e);
+            logger.error("Register failed", e);
             redirectAttributes.addFlashAttribute("error", MessageExtractor.extractMessage(e.getMessage()));
             return "redirect:/register";
         }
@@ -114,7 +115,7 @@ public class AuthPageController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
+    public String logout(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
         String token = null;
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
@@ -126,9 +127,24 @@ public class AuthPageController {
         }
 
         if (token != null) {
-            revokedTokenService.revokeToken(token);
+            try {
+                ResponseEntity<ResponseDTO> apiResponse = restTemplate.postForEntity(
+                        "http://localhost:8080/api/auth/logout",
+                        token,
+                        ResponseDTO.class
+                );
+
+                if (apiResponse.getStatusCode().is2xxSuccessful()) {
+                    redirectAttributes.addFlashAttribute("success", "Успешный выход из системы");
+                } else {
+                    redirectAttributes.addFlashAttribute("error", "Ошибка при выходе из системы");
+                }
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("error", "Ошибка при выходе: " + e.getMessage());
+            }
         }
 
+        // Удаляем токен из cookie
         Cookie cookie = new Cookie("jwt", null);
         cookie.setPath("/");
         cookie.setHttpOnly(true);

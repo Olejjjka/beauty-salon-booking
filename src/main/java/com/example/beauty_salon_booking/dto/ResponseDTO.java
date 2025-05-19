@@ -1,19 +1,17 @@
 package com.example.beauty_salon_booking.dto;
 
-import java.time.LocalDateTime;
-
-public class ErrorResponseDTO {
+public class ResponseDTO {
 
     private String timestamp;
     private int status;
-    private String error;
-    private String message;
+    private String title;
+    private String detail;
 
-    public ErrorResponseDTO(String timestamp, int status, String error, String message) {
+    public ResponseDTO(String timestamp, int status, String title, String detail) {
         this.timestamp = timestamp;
         this.status = status;
-        this.error = error;
-        this.message = message;
+        this.title = title;
+        this.detail = detail;
     }
 
     // Геттеры и сеттеры
@@ -33,19 +31,19 @@ public class ErrorResponseDTO {
         this.status = status;
     }
 
-    public String getError() {
-        return error;
+    public String getTitle() {
+        return title;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getMessage() {
-        return message;
+    public String getDetail() {
+        return detail;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setDetail(String detail) {
+        this.detail = detail;
     }
 }

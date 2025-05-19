@@ -20,7 +20,7 @@ body {
 }
 
 .logo {
-    color: #9ab4c8; /* Мягкий серо-голубой */
+    color: #9ab4c8;
     font-size: 32px;
     letter-spacing: 3px;
     font-weight: 300;
@@ -29,14 +29,14 @@ body {
 }
 
 .logo-subtitle {
-    color: #c0b3a6; /* Бежево-серый */
+    color: #c0b3a6;
     font-size: 14px;
     letter-spacing: 5px;
     margin-top: -5px;
 }
 
 .container {
-    max-width: 400px;
+    max-width: 520px;
     margin: 0 auto;
     padding: 30px;
     background-color: white;
@@ -54,25 +54,28 @@ h2 {
     letter-spacing: 1px;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.subtitle {
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 25px;
 }
 
-div {
+.form-group {
+    margin-bottom: 22px;
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-label {
+.form-group label {
     color: #6b6b6b;
-    font-size: 14px;
     font-weight: 500;
+    font-size: 14px;
 }
 
-input {
+.form-group input {
+    width: 100%;
     padding: 14px 16px;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
@@ -81,27 +84,60 @@ input {
     transition: border-color 0.3s ease;
 }
 
-input:focus {
-    outline: none;
+.form-group input:focus {
     border-color: #a3cddc;
+    outline: none;
     background-color: #fff;
 }
 
-button {
+.form-group input::placeholder {
+    color: #bbb;
+}
+
+.btn-primary {
     background-color: #b8d8e3;
     color: white;
+    font-weight: 600;
+    font-size: 15px;
     border: none;
+    width: 100%;
     padding: 14px;
     border-radius: 10px;
-    font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin-top: 10px;
-    font-weight: 600;
 }
 
-button:hover {
+.btn-primary:hover {
     background-color: #a3cddc;
+}
+
+.auth-link {
+    color: #a3cddc;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+    color: #666;
+}
+
+.success {
+    color: #3c763d;
+    background-color: #e6f4e6;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #c6e0c6;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
 .error {
@@ -113,30 +149,4 @@ button:hover {
     font-size: 14px;
     margin-bottom: 10px;
     text-align: center;
-}
-
-a {
-    color: #a3cddc;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-
-.header h2 {
-    color: #a3cddc;
-    font-size: 26px;
-    margin-bottom: 6px;
-    font-weight: 300;
-    text-align: center;
-}
-
-.auth-footer {
-    text-align: center;
-    margin-top: 25px;
-    font-size: 14px;
-    color: #666;
 }

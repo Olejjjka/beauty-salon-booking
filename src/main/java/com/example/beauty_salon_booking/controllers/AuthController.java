@@ -1,6 +1,6 @@
 package com.example.beauty_salon_booking.controllers;
 
-import com.example.beauty_salon_booking.dto.ErrorResponseDTO;
+import com.example.beauty_salon_booking.dto.ResponseDTO;
 import com.example.beauty_salon_booking.dto.LoginRequestDTO;
 import com.example.beauty_salon_booking.dto.RegisterRequestDTO;
 import com.example.beauty_salon_booking.dto.TokenResponseDTO;
@@ -40,17 +40,17 @@ public class AuthController {
 
     // Регистрация клиента
     @PostMapping("/register/client")
-    public ResponseEntity<ErrorResponseDTO> registerClient(@RequestBody RegisterRequestDTO registerRequest) {
+    public ResponseEntity<ResponseDTO> registerClient(@RequestBody RegisterRequestDTO registerRequest) {
         try {
             clientService.saveClient(registerRequest.toClient());
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ErrorResponseDTO(
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDTO(
                     LocalDateTime.now().toString(),
                     HttpStatus.CREATED.value(),
                     "Client registered successfully",
                     "Success"
             ));
         } catch (ValidationException e) {
-            return ResponseEntity.badRequest().body(new ErrorResponseDTO(
+            return ResponseEntity.badRequest().body(new ResponseDTO(
                     LocalDateTime.now().toString(),
                     HttpStatus.BAD_REQUEST.value(),
                     "Validation error",
@@ -61,17 +61,17 @@ public class AuthController {
 
     // Регистрация мастера
     @PostMapping("/register/master")
-    public ResponseEntity<ErrorResponseDTO> registerMaster(@RequestBody RegisterRequestDTO registerRequest) {
+    public ResponseEntity<ResponseDTO> registerMaster(@RequestBody RegisterRequestDTO registerRequest) {
         try {
             masterService.saveMaster(registerRequest.toMaster());
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ErrorResponseDTO(
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDTO(
                     LocalDateTime.now().toString(),
                     HttpStatus.CREATED.value(),
                     "Master registered successfully",
                     "Success"
             ));
         } catch (ValidationException e) {
-            return ResponseEntity.badRequest().body(new ErrorResponseDTO(
+            return ResponseEntity.badRequest().body(new ResponseDTO(
                     LocalDateTime.now().toString(),
                     HttpStatus.BAD_REQUEST.value(),
                     "Validation error",
@@ -82,31 +82,45 @@ public class AuthController {
 
     // Вход и получение JWT
     @PostMapping("/login")
-    public ResponseEntity<TokenResponseDTO> authenticate(@RequestBody LoginRequestDTO loginRequest) {
+    public ResponseEntity<?> authenticate(@RequestBody LoginRequestDTO loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword())
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getLogin(),
+                            loginRequest.getPassword()
+                    )
             );
             String token = jwtTokenProvider.generateToken(authentication);
             return ResponseEntity.ok(new TokenResponseDTO(token));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenResponseDTO("Invalid credentials"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO(
+                    LocalDateTime.now().toString(),
+                    HttpStatus.UNAUTHORIZED.value(),
+                    "Authentication failed",
+                    "Invalid credentials"
+            ));
         }
     }
 
-
-
-    // Не нужен (Выход из системы и отзыв токена)
+    // Выход из системы и отзыв токена
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.badRequest().body("Missing or invalid Authorization header");
+    public ResponseEntity<ResponseDTO> logout(@RequestBody String token) {
+        try {
+            revokedTokenService.revokeToken(token);
+            return ResponseEntity.ok(new ResponseDTO(
+                    LocalDateTime.now().toString(),
+                    HttpStatus.OK.value(),
+                    "Logout successful",
+                    "Success"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO(
+                    LocalDateTime.now().toString(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "Logout failed",
+                    e.getMessage()
+            ));
         }
-
-        String token = authHeader.substring(7); // Убираем префикс "Bearer "
-
-        revokedTokenService.revokeToken(token); // Отзываем токен
-
-        return ResponseEntity.ok("Successfully logged out");
     }
+
 }

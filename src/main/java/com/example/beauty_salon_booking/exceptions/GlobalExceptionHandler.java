@@ -1,6 +1,6 @@
 package com.example.beauty_salon_booking.exceptions;
 
-import com.example.beauty_salon_booking.dto.ErrorResponseDTO;
+import com.example.beauty_salon_booking.dto.ResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -26,35 +26,35 @@ public class GlobalExceptionHandler {
 
     // 1. Ошибки безопасности (логин, доступ)
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponseDTO> handleBadCredentials(BadCredentialsException ex) {
+    public ResponseEntity<ResponseDTO> handleBadCredentials(BadCredentialsException ex) {
         return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid username or password");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponseDTO> handleAccessDenied(AccessDeniedException ex) {
+    public ResponseEntity<ResponseDTO> handleAccessDenied(AccessDeniedException ex) {
         return buildResponse(HttpStatus.FORBIDDEN, "Access denied");
     }
 
     // 2. Ошибки бизнес-логики
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleEntityNotFound(EntityNotFoundException ex) {
+    public ResponseEntity<ResponseDTO> handleEntityNotFound(EntityNotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, "Entity not found: " + ex.getMessage());
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponseDTO> handleIllegalState(IllegalStateException ex) {
+    public ResponseEntity<ResponseDTO> handleIllegalState(IllegalStateException ex) {
         return buildResponse(HttpStatus.CONFLICT, "Conflict: " + ex.getMessage());
     }
 
     // 3. Ошибки базы данных
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponseDTO> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+    public ResponseEntity<ResponseDTO> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         return buildResponse(HttpStatus.CONFLICT, "Database constraint error: " + ex.getRootCause().getMessage());
     }
 
     // 4. Ошибки валидации запроса
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDTO> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ResponseDTO> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage()));
@@ -63,31 +63,31 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponseDTO> handleMissingParams(MissingServletRequestParameterException ex) {
+    public ResponseEntity<ResponseDTO> handleMissingParams(MissingServletRequestParameterException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Missing parameter: " + ex.getParameterName());
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponseDTO> handleValidationException(ValidationException ex) {
+    public ResponseEntity<ResponseDTO> handleValidationException(ValidationException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     // 5. Ошибки HTTP запросов
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ErrorResponseDTO> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+    public ResponseEntity<ResponseDTO> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
         return buildResponse(HttpStatus.METHOD_NOT_ALLOWED, "HTTP method not allowed: " + ex.getMethod());
     }
 
     // 6. Общий обработчик всех остальных ошибок
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDTO> handleAllOtherExceptions(Exception ex) {
+    public ResponseEntity<ResponseDTO> handleAllOtherExceptions(Exception ex) {
         logger.error("Unexpected error occurred", ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error: " + ex.getMessage());
     }
 
     // Вспомогательный метод для создания ответа
-    private ResponseEntity<ErrorResponseDTO> buildResponse(HttpStatus status, String message) {
-        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+    private ResponseEntity<ResponseDTO> buildResponse(HttpStatus status, String message) {
+        ResponseDTO errorResponse = new ResponseDTO(
                 LocalDateTime.now().toString(),
                 status.value(),
                 status.getReasonPhrase(),

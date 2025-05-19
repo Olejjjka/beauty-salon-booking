@@ -1,6 +1,6 @@
 package com.example.beauty_salon_booking.security;
 
-import com.example.beauty_salon_booking.dto.ErrorResponseDTO;
+import com.example.beauty_salon_booking.dto.ResponseDTO;
 import com.example.beauty_salon_booking.services.RevokedTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -14,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -33,10 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Пропускаем проверку для эндпоинтов авторизации
         if (request.getRequestURI().equals("/") ||
+            request.getRequestURI().startsWith("/api/auth") ||
             request.getRequestURI().startsWith("/register") ||
-            request.getRequestURI().startsWith("/api/auth/register") ||
             request.getRequestURI().startsWith("/login") ||
-            request.getRequestURI().startsWith("/api/auth/login") ||
             request.getRequestURI().startsWith("/css/") ||
             request.getRequestURI().startsWith("/images/") ||
             request.getRequestURI().startsWith("/favicon.ico"))  {
@@ -87,7 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setCharacterEncoding("UTF-8");
 
         // Создаем ErrorResponseDTO для стандартизированного ответа
-        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+        ResponseDTO errorResponse = new ResponseDTO(
                 LocalDateTime.now().toString(),
                 status,
                 message,

@@ -115,7 +115,7 @@ h3 {
     color: #7a8b99;
     font-weight: 300;
     font-size: 20px;
-    margin: 0 0 20px 0;
+    margin: 20px 0;
     border-bottom: 1px solid #e0e0e0;
     padding-bottom: 8px;
 }
@@ -271,7 +271,7 @@ option {
     font-size: 16px;
 }
 
-.success {
+.successMessage {
     color: #3c763d;
     background-color: #e6f4e6;
     padding: 10px 15px;
@@ -282,7 +282,7 @@ option {
     text-align: center;
 }
 
-.error {
+.errorMessage {
     color: #d4a5a5;
     background-color: #fdf5f5;
     padding: 10px 15px;

@@ -22,8 +22,8 @@
         </div>
 
         <!-- Блок отображения ошибки -->
-        <div th:if="${error}" class="error">
-            <p th:text="${error}"></p>
+        <div th:if="${errorRegister}" class="errorMessage">
+            <p th:text="${errorRegister}"></p>
         </div>
 
         <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="auth-form">

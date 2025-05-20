@@ -87,13 +87,19 @@ public class ClientService {
                 .orElseThrow(() -> new EntityNotFoundException("Клиент не найден"));
 
         if (updates.containsKey("username")) {
-            client.setName((String) updates.get("username"));
+            String username = (String) updates.get("username");
+            userValidationService.validateName(username);
+            client.setName(username);
         }
         if (updates.containsKey("phone")) {
-            client.setPhone((String) updates.get("phone"));
+            String phone = (String) updates.get("phone");
+            userValidationService.validatePhone(phone);
+            client.setPhone(phone);
         }
         if (updates.containsKey("login")) {
-            client.setLogin((String) updates.get("login"));
+            String login = (String) updates.get("login");
+            userValidationService.validateLogin(login);
+            client.setLogin(login);
         }
 
         clientRepository.save(client);
@@ -108,7 +114,7 @@ public class ClientService {
                 .orElseThrow(() -> new EntityNotFoundException("Client not found"));
 
         if (!passwordEncoder.matches(oldPassword, client.getPassword())) {
-            throw new RuntimeException("Current password is incorrect");
+            throw new RuntimeException("Указан неверный текущий пароль");
         }
 
         userValidationService.validatePassword(newPassword);

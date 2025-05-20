@@ -64,7 +64,7 @@ public class AppointmentPageController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_MASTER"))) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Мастера не могут записываться на услуги.");
+            redirectAttributes.addFlashAttribute("errorMasterAccess", "Мастера не могут записываться на услуги.");
             return "redirect:/dashboard"; // Или любая подходящая страница
         }
 
@@ -91,7 +91,7 @@ public class AppointmentPageController {
                     List<AvailableTimeSlotDTO> timeSlots = availableDates.get(parsedDate);
                     model.addAttribute("timeSlots", timeSlots);
                 } catch (Exception e) {
-                    model.addAttribute("errorMessage", "Неверный формат даты");
+                    model.addAttribute("errorFormatDate", "Неверный формат даты");
                 }
             }
         }
@@ -109,11 +109,11 @@ public class AppointmentPageController {
 
             AppointmentDTO appointmentDTO = appointmentService.createAppointment(beautyServiceId, masterId, date, time);
 
-            redirectAttributes.addFlashAttribute("successMessage", "Запись успешно создана на " +
+            redirectAttributes.addFlashAttribute("successCreateAppointment", "Запись успешно создана на " +
                     appointmentDTO.getDate() + " в " + appointmentDTO.getTime());
             return "redirect:/dashboard";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при создании записи: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorCreateAppointment", "Ошибка при создании записи: " + e.getMessage());
             return "redirect:/appointment/select";
         }
     }

@@ -67,11 +67,11 @@ public class AuthPageController {
 
                 return "redirect:/homepage";
             } else {
-                redirectAttributes.addFlashAttribute("error", "Ошибка авторизации");
+                redirectAttributes.addFlashAttribute("errorLogin", "Ошибка при аутентификации");
                 return "redirect:/login";
             }
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Неверный логин или пароль");
+            redirectAttributes.addFlashAttribute("errorLogin", "Неверный логин или пароль");
             return "redirect:/login";
         }
     }
@@ -95,16 +95,16 @@ public class AuthPageController {
 
             // Если регистрация успешна, редирект на страницу логина
             if (response.getStatusCode().is2xxSuccessful()) {
-                redirectAttributes.addFlashAttribute("success", "Регистрация прошла успешно");
+                redirectAttributes.addFlashAttribute("successRegister", "Регистрация прошла успешно");
                 return "redirect:/login";
             } else {
                 // Ошибка с регистрацией (например, с API)
-                redirectAttributes.addFlashAttribute("error", "Ошибка при регистрации");
+                redirectAttributes.addFlashAttribute("errorRegister", "Ошибка при регистрации");
                 return "redirect:/register";
             }
         } catch (Exception e) {
             logger.error("Register failed", e);
-            redirectAttributes.addFlashAttribute("error", MessageExtractor.extractMessage(e.getMessage()));
+            redirectAttributes.addFlashAttribute("errorRegister", MessageExtractor.extractMessage(e.getMessage()));
             return "redirect:/register";
         }
     }
@@ -135,12 +135,12 @@ public class AuthPageController {
                 );
 
                 if (apiResponse.getStatusCode().is2xxSuccessful()) {
-                    redirectAttributes.addFlashAttribute("success", "Успешный выход из системы");
+                    redirectAttributes.addFlashAttribute("successLogout", "Успешный выход из системы");
                 } else {
-                    redirectAttributes.addFlashAttribute("error", "Ошибка при выходе из системы");
+                    redirectAttributes.addFlashAttribute("errorLogout", "Ошибка при выходе из системы");
                 }
             } catch (Exception e) {
-                redirectAttributes.addFlashAttribute("error", "Ошибка при выходе: " + e.getMessage());
+                redirectAttributes.addFlashAttribute("errorLogout", "Ошибка при выходе: " + e.getMessage());
             }
         }
 

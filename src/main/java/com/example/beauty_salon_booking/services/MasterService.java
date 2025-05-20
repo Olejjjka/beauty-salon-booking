@@ -234,13 +234,19 @@ public class MasterService {
                 .orElseThrow(() -> new EntityNotFoundException("Мастер не найден"));
 
         if (updates.containsKey("username")) {
-            master.setName((String) updates.get("username"));
+            String username = (String) updates.get("username");
+            userValidationService.validateName(username);
+            master.setName(username);
         }
         if (updates.containsKey("phone")) {
-            master.setPhone((String) updates.get("phone"));
+            String phone = (String) updates.get("phone");
+            userValidationService.validatePhone(phone);
+            master.setPhone(phone);
         }
         if (updates.containsKey("login")) {
-            master.setLogin((String) updates.get("login"));
+            String login = (String) updates.get("login");
+            userValidationService.validateLogin(login);
+            master.setLogin(login);
         }
 
         masterRepository.save(master);
@@ -255,7 +261,7 @@ public class MasterService {
                 .orElseThrow(() -> new EntityNotFoundException ("Master not found"));
 
         if (!passwordEncoder.matches(oldPassword, master.getPassword())) {
-            throw new RuntimeException("Current password is incorrect");
+            throw new RuntimeException("Указан неверный текущий пароль");
         }
 
         userValidationService.validatePassword(newPassword);

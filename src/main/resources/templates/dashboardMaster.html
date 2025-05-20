@@ -35,8 +35,8 @@
             <div class="user-name" th:text="${username}">пользователь</div>
         </div>
 
-        <div th:if="${errorMessage}" style="color: red; margin-bottom: 15px;">
-            <p th:text="${errorMessage}"></p>
+        <div th:if="${errorMasterAccess}" class="errorMessage">
+            <p th:text="${errorMasterAccess}"></p>
         </div>
 
         <!-- Вкладки -->
@@ -64,39 +64,49 @@
 
                     <h3>Редактировать профиль</h3>
 
-                    <div th:if="${warning}" style="color: orange; margin-bottom: 15px;">
-                        <p th:text="${warning}"></p>
+                    <div th:if="${errorUpdateProfile}" class="errorMessage">
+                        <p th:text="${errorUpdateProfile}"></p>
                     </div>
 
-                    <form th:action="@{/dashboard/client/update-profile}" method="post" class="profile-form">
-                        <input type="hidden" name="clientId" th:value="${clientId}" />
+                    <form th:action="@{/dashboard/master/update-profile}" method="post" class="profile-form">
+                        <input type="hidden" name="masterId" th:value="${masterId}" />
 
-                        <label for="name">Имя:</label>
-                        <input type="text" id="name" name="name" placeholder="Новое имя" />
+                        <div class="form-group">
+                            <label for="name">Имя:</label>
+                            <input type="text" id="name" name="name" placeholder="Новое имя" />
+                        </div>
 
-                        <label for="phone">Телефон:</label>
-                        <input type="text" id="phone" name="phone" placeholder="Новый телефон" />
+                        <div class="form-group">
+                            <label for="phone">Телефон:</label>
+                            <input type="text" id="phone" name="phone" placeholder="Новый телефон" />
+                        </div>
 
-                        <label for="login">Логин:</label>
-                        <input type="text" id="login" name="login" placeholder="Новый логин" />
+                        <div class="form-group">
+                            <label for="login">Логин:</label>
+                            <input type="text" id="login" name="login" placeholder="Новый логин" />
+                        </div>
 
                         <button type="submit">Обновить профиль</button>
                     </form>
 
                     <h3>Сменить пароль</h3>
 
-                    <div th:if="${error}" style="color: red; margin-bottom: 15px;">
-                        <p th:text="${error}"></p>
+                    <div th:if="${errorChangePassword}" class="errorMessage">
+                        <p th:text="${errorChangePassword}"></p>
                     </div>
 
-                    <form th:action="@{/dashboard/client/change-password}" method="post">
-                        <input type="hidden" name="clientId" th:value="${clientId}" />
+                    <form th:action="@{/dashboard/master/change-password}" method="post">
+                        <input type="hidden" name="masterId" th:value="${masterId}" />
 
-                        <label for="oldPassword">Старый пароль:</label>
-                        <input type="password" id="oldPassword" name="oldPassword" placeholder="Текущий пароль" required />
+                        <div class="form-group">
+                            <label for="oldPassword">Старый пароль:</label>
+                            <input type="password" id="oldPassword" name="oldPassword" placeholder="Текущий пароль" required />
+                        </div>
 
-                        <label for="newPassword">Новый пароль:</label>
-                        <input type="password" id="newPassword" name="newPassword" placeholder="Новый пароль" required />
+                        <div class="form-group">
+                            <label for="newPassword">Новый пароль:</label>
+                            <input type="password" id="newPassword" name="newPassword" placeholder="Новый пароль" required />
+                        </div>
 
                         <button type="submit">Сменить пароль</button>
                     </form>

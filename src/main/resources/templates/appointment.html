@@ -21,6 +21,10 @@
 
     <div class="appointment-container">
 
+        <div th:if="${errorCreateAppointment}" class="errorMessage">
+            <p th:text="${errorCreateAppointment}"></p>
+        </div>
+
         <!-- Шаг 1: Выбор услуги -->
         <form th:action="@{/appointment/select}" method="post">
             <label>Услуга:</label>
@@ -54,6 +58,11 @@
 
         <!-- Шаг 3: Выбор даты -->
         <div th:if="${selectedMasterId != null}">
+
+            <div th:if="${errorFormatDate}" class="errorMessage">
+                <p th:text="${errorFormatDate}"></p>
+            </div>
+
             <form th:action="@{/appointment/select}" method="post">
                 <input type="hidden" name="beautyServiceId" th:value="${selectedServiceId}" />
                 <input type="hidden" name="masterId" th:value="${selectedMasterId}" />

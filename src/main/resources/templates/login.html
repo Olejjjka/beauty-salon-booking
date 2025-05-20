@@ -20,12 +20,20 @@
         <h2>Вход в систему</h2>
     </div>
 
-    <div th:if="${success}" class="success">
-        <p th:text="${success}"></p>
+    <div th:if="${successRegister}" class="successMessage">
+        <p th:text="${successRegister}"></p>
     </div>
 
-    <div th:if="${error}" class="error">
-        <p th:text="${error}"></p>
+    <div th:if="${successLogout}" class="successMessage">
+        <p th:text="${successLogout}"></p>
+    </div>
+
+    <div th:if="${errorLogin}" class="errorMessage">
+        <p th:text="${errorLogin}"></p>
+    </div>
+
+    <div th:if="${errorLogout}" class="errorMessage">
+        <p th:text="${errorLogout}"></p>
     </div>
 
     <form th:action="@{/login}" th:object="${loginRequest}" method="post">

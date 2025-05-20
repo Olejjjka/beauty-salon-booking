@@ -129,7 +129,7 @@ h2 {
     color: #666;
 }
 
-.success {
+.successMessage {
     color: #3c763d;
     background-color: #e6f4e6;
     padding: 10px 15px;
@@ -140,7 +140,7 @@ h2 {
     text-align: center;
 }
 
-.error {
+.errorMessage {
     color: #d4a5a5;
     background-color: #fdf5f5;
     padding: 10px 15px;

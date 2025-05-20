@@ -118,24 +118,29 @@ public class DashboardController {
             @RequestParam(required = false) String login,
             RedirectAttributes redirectAttributes) {
 
-        Map<String, Object> updates = new HashMap<>();
+        try {
+            Map<String, Object> updates = new HashMap<>();
 
-        if (name != null && !name.trim().isEmpty()) {
-            updates.put("username", name.trim());
-        }
-        if (phone != null && !phone.trim().isEmpty()) {
-            updates.put("phone", phone.trim());
-        }
-        if (login != null && !login.trim().isEmpty()) {
-            updates.put("login", login.trim());
-        }
+            if (name != null && !name.trim().isEmpty()) {
+                updates.put("username", name.trim());
+            }
+            if (phone != null && !phone.trim().isEmpty()) {
+                updates.put("phone", phone.trim());
+            }
+            if (login != null && !login.trim().isEmpty()) {
+                updates.put("login", login.trim());
+            }
 
-        if (updates.isEmpty()) {
-            redirectAttributes.addFlashAttribute("warning", "Нужно заполнить хотя бы одно поле для обновления профиля.");
+            if (updates.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorUpdateProfile", "Нужно заполнить хотя бы одно поле для обновления профиля.");
+                return "redirect:/dashboard";
+            }
+
+            masterService.updateMaster(masterId, updates);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorUpdateProfile", e.getMessage());
             return "redirect:/dashboard";
         }
-
-        masterService.updateMaster(masterId, updates);
         return "redirect:/logout";
     }
 
@@ -148,10 +153,10 @@ public class DashboardController {
         try {
             masterService.changePassword(masterId, oldPassword, newPassword);
         } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("error", "Указан неверный текущий пароль");
+            redirectAttributes.addFlashAttribute("errorChangePassword", e.getMessage());
             return "redirect:/dashboard";
         }
-        return "redirect:/logout"; // после смены пароля — выход
+        return "redirect:/logout";
     }
 
     @PostMapping("/dashboard/client/update-profile")
@@ -162,24 +167,29 @@ public class DashboardController {
             @RequestParam(required = false) String login,
             RedirectAttributes redirectAttributes) {
 
-        Map<String, Object> updates = new HashMap<>();
+        try {
+            Map<String, Object> updates = new HashMap<>();
 
-        if (name != null && !name.trim().isEmpty()) {
-            updates.put("username", name.trim());
-        }
-        if (phone != null && !phone.trim().isEmpty()) {
-            updates.put("phone", phone.trim());
-        }
-        if (login != null && !login.trim().isEmpty()) {
-            updates.put("login", login.trim());
-        }
+            if (name != null && !name.trim().isEmpty()) {
+                updates.put("username", name.trim());
+            }
+            if (phone != null && !phone.trim().isEmpty()) {
+                updates.put("phone", phone.trim());
+            }
+            if (login != null && !login.trim().isEmpty()) {
+                updates.put("login", login.trim());
+            }
 
-        if (updates.isEmpty()) {
-            redirectAttributes.addFlashAttribute("warning", "Нужно заполнить хотя бы одно поле для обновления профиля.");
+            if (updates.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorUpdateProfile", "Нужно заполнить хотя бы одно поле для обновления профиля.");
+                return "redirect:/dashboard";
+            }
+
+            clientService.updateClient(clientId, updates);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorUpdateProfile", e.getMessage());
             return "redirect:/dashboard";
         }
-
-        clientService.updateClient(clientId, updates);
         return "redirect:/logout";
     }
 
@@ -192,9 +202,9 @@ public class DashboardController {
         try {
             clientService.changePassword(clientId, oldPassword, newPassword);
         } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("error", "Указан неверный текущий пароль");
+            redirectAttributes.addFlashAttribute("errorChangePassword", e.getMessage());
             return "redirect:/dashboard";
         }
-        return "redirect:/logout"; // после смены пароля — выход
+        return "redirect:/logout";
     }
 }

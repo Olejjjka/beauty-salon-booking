@@ -164,3 +164,25 @@ button:disabled {
     background-color: #d4e4ea;
     cursor: not-allowed;
 }
+
+.successMessage {
+    color: #3c763d;
+    background-color: #e6f4e6;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #c6e0c6;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.errorMessage {
+    color: #d4a5a5;
+    background-color: #fdf5f5;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #f0d8d8;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}

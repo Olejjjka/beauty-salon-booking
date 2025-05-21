@@ -18,13 +18,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.*;
 
 @Controller
-public class DashboardController {
+public class DashboardPageController {
 
     private final MasterService masterService;
     private final ClientService clientService;
     private final BeautyServiceService beautyServiceService;
 
-    public DashboardController(MasterService masterService, ClientService clientService, BeautyServiceService beautyServiceService) {
+    public DashboardPageController(MasterService masterService, ClientService clientService, BeautyServiceService beautyServiceService) {
         this.masterService = masterService;
         this.clientService = clientService;
         this.beautyServiceService = beautyServiceService;

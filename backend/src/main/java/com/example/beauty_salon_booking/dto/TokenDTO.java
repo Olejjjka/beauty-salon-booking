@@ -1,10 +1,10 @@
 package com.example.beauty_salon_booking.dto;
 
-public class TokenResponseDTO {
+public class TokenDTO {
 
     private String token;
 
-    public TokenResponseDTO(String token) {
+    public TokenDTO(String token) {
         this.token = token;
     }
 

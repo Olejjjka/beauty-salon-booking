@@ -3,15 +3,13 @@ package com.example.beauty_salon_booking.controllers;
 import com.example.beauty_salon_booking.dto.ResponseDTO;
 import com.example.beauty_salon_booking.dto.LoginRequestDTO;
 import com.example.beauty_salon_booking.dto.RegisterRequestDTO;
-import com.example.beauty_salon_booking.dto.TokenResponseDTO;
+import com.example.beauty_salon_booking.dto.TokenDTO;
 import com.example.beauty_salon_booking.exceptions.MessageExtractor;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +22,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AuthPageController {
-    private static final Logger logger = LoggerFactory.getLogger(AuthPageController.class);
     private final RestTemplate restTemplate;
 
     public AuthPageController(RestTemplate restTemplate) {
@@ -47,10 +44,10 @@ public class AuthPageController {
                               HttpServletResponse response,
                               RedirectAttributes redirectAttributes) {
         try {
-            ResponseEntity<TokenResponseDTO> apiResponse = restTemplate.postForEntity(
+            ResponseEntity<TokenDTO> apiResponse = restTemplate.postForEntity(
                     "http://localhost:8080/api/auth/login",
                     loginRequest,
-                    TokenResponseDTO.class
+                    TokenDTO.class
             );
 
             if (apiResponse.getStatusCode().is2xxSuccessful() &&
@@ -103,7 +100,6 @@ public class AuthPageController {
                 return "redirect:/register";
             }
         } catch (Exception e) {
-            logger.error("Register failed", e);
             redirectAttributes.addFlashAttribute("errorRegister", MessageExtractor.extractMessage(e.getMessage()));
             return "redirect:/register";
         }
@@ -128,9 +124,11 @@ public class AuthPageController {
 
         if (token != null) {
             try {
+                TokenDTO tokenDTO = new TokenDTO(token);
+
                 ResponseEntity<ResponseDTO> apiResponse = restTemplate.postForEntity(
                         "http://localhost:8080/api/auth/logout",
-                        token,
+                        tokenDTO,
                         ResponseDTO.class
                 );
 

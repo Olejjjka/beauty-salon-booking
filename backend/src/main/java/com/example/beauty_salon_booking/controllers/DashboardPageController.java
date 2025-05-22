@@ -144,7 +144,6 @@ public class DashboardPageController {
         return "redirect:/logout";
     }
 
-
     @PostMapping("/dashboard/master/change-password")
     public String changeMasterPassword(@RequestParam Long masterId,
                                  @RequestParam String oldPassword,
@@ -192,7 +191,6 @@ public class DashboardPageController {
         }
         return "redirect:/logout";
     }
-
 
     @PostMapping("/dashboard/client/change-password")
     public String changeClientPassword(@RequestParam Long clientId,

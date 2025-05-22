@@ -3,7 +3,7 @@ package com.example.beauty_salon_booking.controllers;
 import com.example.beauty_salon_booking.dto.ResponseDTO;
 import com.example.beauty_salon_booking.dto.LoginRequestDTO;
 import com.example.beauty_salon_booking.dto.RegisterRequestDTO;
-import com.example.beauty_salon_booking.dto.TokenResponseDTO;
+import com.example.beauty_salon_booking.dto.TokenDTO;
 import com.example.beauty_salon_booking.exceptions.ValidationException;
 import com.example.beauty_salon_booking.security.JwtTokenProvider;
 import com.example.beauty_salon_booking.services.ClientService;
@@ -91,22 +91,22 @@ public class AuthController {
                     )
             );
             String token = jwtTokenProvider.generateToken(authentication);
-            return ResponseEntity.ok(new TokenResponseDTO(token));
+            return ResponseEntity.ok(new TokenDTO(token));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO(
                     LocalDateTime.now().toString(),
                     HttpStatus.UNAUTHORIZED.value(),
                     "Authentication failed",
-                    "Invalid credentials"
+                    e.getMessage()
             ));
         }
     }
 
     // Выход из системы и отзыв токена
     @PostMapping("/logout")
-    public ResponseEntity<ResponseDTO> logout(@RequestBody String token) {
+    public ResponseEntity<ResponseDTO> logout(@RequestBody TokenDTO token) {
         try {
-            revokedTokenService.revokeToken(token);
+            revokedTokenService.revokeToken(token.getToken());
             return ResponseEntity.ok(new ResponseDTO(
                     LocalDateTime.now().toString(),
                     HttpStatus.OK.value(),
@@ -122,5 +122,4 @@ public class AuthController {
             ));
         }
     }
-
 }

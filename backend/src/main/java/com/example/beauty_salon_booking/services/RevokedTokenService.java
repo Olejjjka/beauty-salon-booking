@@ -2,6 +2,8 @@ package com.example.beauty_salon_booking.services;
 
 import com.example.beauty_salon_booking.entities.RevokedToken;
 import com.example.beauty_salon_booking.repositories.RevokedTokenRepository;
+import com.example.beauty_salon_booking.security.JwtTokenProvider;
+import com.example.beauty_salon_booking.exceptions.InvalidTokenException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,15 +13,19 @@ import java.time.temporal.ChronoUnit;
 public class RevokedTokenService {
 
     private final RevokedTokenRepository revokedTokenRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public RevokedTokenService(RevokedTokenRepository revokedTokenRepository) {
+    public RevokedTokenService(RevokedTokenRepository revokedTokenRepository, JwtTokenProvider jwtTokenProvider) {
         this.revokedTokenRepository = revokedTokenRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     public void revokeToken(String token) {
-        if (!revokedTokenRepository.existsByToken(token)) {
+        if (!revokedTokenRepository.existsByToken(token) && jwtTokenProvider.validateToken(token)) {
             RevokedToken revokedToken = new RevokedToken(token, LocalDateTime.now());
             revokedTokenRepository.save(revokedToken);
+        } else {
+            throw new InvalidTokenException("Токен уже отозван или недействителен");
         }
     }
 

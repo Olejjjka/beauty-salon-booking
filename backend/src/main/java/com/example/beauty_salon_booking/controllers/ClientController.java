@@ -46,7 +46,6 @@ public class ClientController {
     // для причастного клиента
     @PatchMapping("/{clientId}")
     public ResponseEntity<?> updateClient(@PathVariable Long clientId, @RequestBody Map<String, Object> updates) {
-
         clientService.updateClient(clientId, updates);
         return ResponseEntity.ok("Profile changed successfully. Please log in again.");
     }

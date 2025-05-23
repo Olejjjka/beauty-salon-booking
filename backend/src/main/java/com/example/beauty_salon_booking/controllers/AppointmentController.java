@@ -5,6 +5,7 @@ import com.example.beauty_salon_booking.dto.ClientDTO;
 import com.example.beauty_salon_booking.dto.MasterDTO;
 import com.example.beauty_salon_booking.enums.AppointmentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,10 +84,15 @@ public class AppointmentController {
     }
 
     // для всех клиентов
-    //@PostMapping("/create")
-    //public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, Object> payload) {
-    //    return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(payload));
-    //}
+    @PostMapping("/create")
+    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody Map<String, String> payload) {
+        Long beautyServiceId = Long.parseLong(payload.get("beautyServiceId"));
+        Long masterId = Long.parseLong(payload.get("masterId"));
+        LocalDate date = LocalDate.parse(payload.get("date"));
+        LocalTime time = LocalTime.parse(payload.get("time"));
+        AppointmentDTO appointmentDTO = appointmentService.createAppointment(beautyServiceId, masterId, date, time);
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentDTO);
+    }
 
     // для причастного мастера, который связан с конкретной записью
     @PutMapping("/{appointmentId}")

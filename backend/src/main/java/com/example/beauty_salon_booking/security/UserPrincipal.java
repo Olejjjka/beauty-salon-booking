@@ -41,10 +41,8 @@ public class UserPrincipal implements UserDetails {
     public Long getId() {
         return id;
     }
-
     public String getName() { return name; }
     public String getPhone() { return phone; }
-
     public Role getRole() {
         return role;
     }

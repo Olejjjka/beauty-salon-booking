@@ -86,8 +86,8 @@ public class ClientService {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new EntityNotFoundException("Клиент не найден"));
 
-        if (updates.containsKey("username")) {
-            String username = (String) updates.get("username");
+        if (updates.containsKey("name")) {
+            String username = (String) updates.get("name");
             userValidationService.validateName(username);
             client.setName(username);
         }

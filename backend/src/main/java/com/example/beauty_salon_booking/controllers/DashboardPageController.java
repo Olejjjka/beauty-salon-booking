@@ -98,8 +98,8 @@ public class DashboardPageController {
 
     @PostMapping("/dashboard/master/remove-service")
     public String removeServiceFromMaster(@RequestParam Long masterId,
-                                          @RequestParam Long serviceId) {
-        masterService.removeBeautyServiceFromMaster(masterId, serviceId);
+                                          @RequestParam Long beautyServiceId) {
+        masterService.removeBeautyServiceFromMaster(masterId, beautyServiceId);
         return "redirect:/dashboard";
     }
 
@@ -122,7 +122,7 @@ public class DashboardPageController {
             Map<String, Object> updates = new HashMap<>();
 
             if (name != null && !name.trim().isEmpty()) {
-                updates.put("username", name.trim());
+                updates.put("name", name.trim());
             }
             if (phone != null && !phone.trim().isEmpty()) {
                 updates.put("phone", phone.trim());
@@ -170,7 +170,7 @@ public class DashboardPageController {
             Map<String, Object> updates = new HashMap<>();
 
             if (name != null && !name.trim().isEmpty()) {
-                updates.put("username", name.trim());
+                updates.put("name", name.trim());
             }
             if (phone != null && !phone.trim().isEmpty()) {
                 updates.put("phone", phone.trim());

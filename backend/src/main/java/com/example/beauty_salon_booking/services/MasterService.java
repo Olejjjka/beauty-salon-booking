@@ -233,8 +233,8 @@ public class MasterService {
         Master master = masterRepository.findById(masterId)
                 .orElseThrow(() -> new EntityNotFoundException("Мастер не найден"));
 
-        if (updates.containsKey("username")) {
-            String username = (String) updates.get("username");
+        if (updates.containsKey("name")) {
+            String username = (String) updates.get("name");
             userValidationService.validateName(username);
             master.setName(username);
         }

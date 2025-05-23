@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Запись на услугу</title>
+    <link rel="stylesheet" th:href="@{/css/styleAppointment.css}" href="/css/styleAppointment.css" />
+</head>
+
+<body>
+    <!-- Шапка -->
+    <header class="main-header">
+        <div class="logo">Beauty Salon</div>
+        <div class="button-group">
+            <a th:href="@{/homepage}" class="home-btn">На главную</a>
+            <a th:href="@{/dashboard}" class="dashboard-btn">Личный кабинет</a>
+        </div>
+    </header>
+
+    <h1>Запись на услугу</h1>
+
+    <div class="appointment-container">
+
+        <div th:if="${errorCreateAppointment}" class="errorMessage">
+            <p th:text="${errorCreateAppointment}"></p>
+        </div>
+
+        <!-- Шаг 1: Выбор услуги -->
+        <form th:action="@{/appointment/select}" method="post">
+            <label>Услуга:</label>
+            <select name="beautyServiceId" required>
+                <option value="">-- выберите --</option>
+                <option th:each="service : ${services}"
+                        th:value="${service.id}"
+                        th:text="${service.name}"
+                        th:selected="${selectedServiceId} == ${service.id}">
+                </option>
+            </select>
+            <button type="submit">Выбрать</button>
+        </form>
+
+        <!-- Шаг 2: Выбор мастера -->
+        <div th:if="${selectedServiceId != null}">
+            <form th:action="@{/appointment/select}" method="post">
+                <input type="hidden" name="beautyServiceId" th:value="${selectedServiceId}" />
+                <label>Мастер:</label>
+                <select name="masterId" required>
+                    <option value="">-- выберите --</option>
+                    <option th:each="master : ${masters}"
+                            th:value="${master.id}"
+                            th:text="${master.name}"
+                            th:selected="${selectedMasterId} == ${master.id}">
+                    </option>
+                </select>
+                <button type="submit">Выбрать</button>
+            </form>
+        </div>
+
+        <!-- Шаг 3: Выбор даты -->
+        <div th:if="${selectedMasterId != null}">
+
+            <div th:if="${errorFormatDate}" class="errorMessage">
+                <p th:text="${errorFormatDate}"></p>
+            </div>
+
+            <form th:action="@{/appointment/select}" method="post">
+                <input type="hidden" name="beautyServiceId" th:value="${selectedServiceId}" />
+                <input type="hidden" name="masterId" th:value="${selectedMasterId}" />
+                <label>Дата:</label>
+                <select name="selectedDate" required>
+                    <option value="">-- выберите --</option>
+                    <option th:each="date : ${availableDates}"
+                            th:value="${date.key}"
+                            th:text="${date.key}"
+                            th:selected="${selectedDate} == ${date.key}">
+                    </option>
+                </select>
+                <button type="submit">Выбрать</button>
+            </form>
+        </div>
+
+        <!-- Шаг 4: Подтверждение записи -->
+        <div th:if="${selectedDate != null}">
+            <form th:action="@{/appointment/confirm}" method="post">
+                <input type="hidden" name="beautyServiceId" th:value="${selectedServiceId}" />
+                <input type="hidden" name="masterId" th:value="${selectedMasterId}" />
+                <input type="hidden" name="date" th:value="${selectedDate}" />
+
+                <label>Время:</label>
+                <select name="time" required>
+                    <option value="">-- выберите --</option>
+                    <option th:each="slot : ${timeSlots}"
+                            th:value="${slot.start}"
+                            th:text="${slot.start} + ' - ' + ${slot.end}">
+                    </option>
+                </select>
+                <button type="submit">Записаться</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

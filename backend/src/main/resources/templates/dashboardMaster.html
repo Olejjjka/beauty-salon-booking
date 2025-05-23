@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Beauty Salon</title>
+
+    <!-- Основные стили -->
+    <link rel="stylesheet" th:href="@{/css/styleDashboard.css}" href="/css/styleDashboard.css" />
+    <!-- Стили вкладок -->
+    <link rel="stylesheet" th:href="@{/css/styleTabs.css}" href="/css/styleTabs.css" />
+    <!-- Иконки FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="logo">Beauty Salon</div>
+            <div class="button-group">
+                <a th:href="@{/homepage}" class="home-btn">На главную</a>
+                <a th:href="@{/logout}" class="logout-btn">Выйти</a>
+            </div>
+        </div>
+
+        <h2>Личный кабинет</h2>
+
+        <!-- Блок с аватаром -->
+        <div class="user-profile">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-name" th:text="${username}">пользователь</div>
+        </div>
+
+        <div th:if="${errorMasterAccess}" class="errorMessage">
+            <p th:text="${errorMasterAccess}"></p>
+        </div>
+
+        <!-- Вкладки -->
+        <div class="tabs-container">
+            <input type="radio" name="tab" id="tab1" checked>
+            <input type="radio" name="tab" id="tab2">
+            <input type="radio" name="tab" id="tab3">
+
+            <div class="tabs-header">
+                <label for="tab1" class="tab-label">О себе</label>
+                <label for="tab2" class="tab-label">Мои услуги</label>
+                <label for="tab3" class="tab-label">Мои записи</label>
+            </div>
+
+            <div class="tab-contents">
+                <!-- Контент вкладки Редактирование -->
+                <div class="tab-content" id="content1">
+                    <h3>Информация</h3>
+                    <div class="record-field">
+                        <strong>Логин:</strong> <span th:text="${login}">Логин</span>
+                    </div>
+                    <div class="record-field">
+                        <strong>Телефон:</strong> <span th:text="${phone}">Телефон</span>
+                    </div>
+
+                    <h3>Редактировать профиль</h3>
+
+                    <div th:if="${errorUpdateProfile}" class="errorMessage">
+                        <p th:text="${errorUpdateProfile}"></p>
+                    </div>
+
+                    <form th:action="@{/dashboard/master/update-profile}" method="post" class="profile-form">
+                        <input type="hidden" name="masterId" th:value="${masterId}" />
+
+                        <div class="form-group">
+                            <label for="name">Имя:</label>
+                            <input type="text" id="name" name="name" placeholder="Новое имя" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Телефон:</label>
+                            <input type="text" id="phone" name="phone" placeholder="Новый телефон" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login">Логин:</label>
+                            <input type="text" id="login" name="login" placeholder="Новый логин" />
+                        </div>
+
+                        <button type="submit">Обновить профиль</button>
+                    </form>
+
+                    <h3>Сменить пароль</h3>
+
+                    <div th:if="${errorChangePassword}" class="errorMessage">
+                        <p th:text="${errorChangePassword}"></p>
+                    </div>
+
+                    <form th:action="@{/dashboard/master/change-password}" method="post">
+                        <input type="hidden" name="masterId" th:value="${masterId}" />
+
+                        <div class="form-group">
+                            <label for="oldPassword">Старый пароль:</label>
+                            <input type="password" id="oldPassword" name="oldPassword" placeholder="Текущий пароль" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newPassword">Новый пароль:</label>
+                            <input type="password" id="newPassword" name="newPassword" placeholder="Новый пароль" required />
+                        </div>
+
+                        <button type="submit">Сменить пароль</button>
+                    </form>
+                </div>
+
+                <!-- Контент вкладки Услуги -->
+                <div class="tab-content" id="content2">
+                    <h3>Ваши услуги</h3>
+                    <div class="services-grid">
+                        <div th:each="service : ${services}" class="record-card">
+                            <div class="record-field">
+                                <strong>Название:</strong> <span th:text="${service.name}">название</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Описание:</strong> <span th:text="${service.description}">описание</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Цена:</strong> <span th:text="${service.price}">0</span> ₽
+                            </div>
+                            <form th:action="@{/dashboard/master/remove-service}" method="post">
+                                <input type="hidden" name="masterId" th:value="${masterId}" />
+                                <input type="hidden" name="serviceId" th:value="${service.id}" />
+                                <button type="submit" class="delete-button">Удалить услугу</button>
+                            </form>
+                        </div>
+                        <p th:if="${services.isEmpty()}" class="no-records">У вас пока нет добавленных услуг.</p>
+                    </div>
+
+                    <h3>Добавить новую услугу</h3>
+                    <div th:if="${allAssigned}">
+                        <p>Все доступные услуги уже добавлены.</p>
+                    </div>
+                    <div th:unless="${allAssigned}">
+                        <form th:action="@{/dashboard/master/add-service}" method="post">
+                            <input type="hidden" name="masterId" th:value="${masterId}" />
+                            <label for="serviceSelect">Выберите услугу:</label>
+                            <select id="serviceSelect" name="beautyServiceId" required>
+                                <option th:each="service : ${allServices}"
+                                        th:value="${service.id}"
+                                        th:text="${service.name}">
+                                </option>
+                            </select>
+                            <button type="submit">Добавить услугу</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Контент вкладки Записи -->
+                <div class="tab-content" id="content3">
+                    <h3>Ваши записи</h3>
+                    <div class="records-grid">
+                        <div th:each="record : ${records}" class="record-card">
+                            <div class="record-field">
+                                <strong>Дата:</strong> <span th:text="${record.date}">дата</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Время:</strong> <span th:text="${record.time}">время</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Услуга:</strong> <span th:text="${record.beautyService.name}">услуга</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Клиент:</strong> <span th:text="${record.client.name}">клиент</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Статус:</strong>
+                                <form th:action="@{/dashboard/master/update-status}" method="post">
+                                    <input type="hidden" name="appointmentId" th:value="${record.id}" />
+                                    <select name="status">
+                                        <option th:each="status : ${statuses}"
+                                                th:value="${status}"
+                                                th:text="${status}"
+                                                th:selected="${status} == ${record.status}">
+                                        </option>
+                                    </select>
+                                    <button type="submit">Обновить</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <p th:if="${records.isEmpty()}" class="no-records">У вас пока нет записей.</p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Заглушка для дополнительного контента -->
+        <div class="content-placeholder">
+            Дополнительная информация будет здесь
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Beauty Salon | Главная</title>
+    <link rel="stylesheet" th:href="@{/css/styleHomepage.css}" href="/css/styleHomepage.css">
+</head>
+
+<body>
+<!-- Шапка -->
+<header class="main-header">
+    <div class="logo">Beauty Salon</div>
+    <a th:href="@{/dashboard}" class="dashboard-btn">Личный кабинет</a>
+</header>
+
+<!-- Основной блок -->
+<main class="main-content">
+    <section class="intro">
+        <h1>Добро пожаловать в Beauty Salon</h1>
+        <p>Мы предлагаем профессиональные услуги красоты от опытных мастеров. Расслабьтесь, обновитесь и почувствуйте себя великолепно!</p>
+        <a th:href="@{/appointment/select}" class="appointment-btn">Записаться на услугу</a>
+    </section>
+
+    <section class="gallery">
+        <img src="/images/salon1.jpg" alt="Салон красоты">
+        <img src="/images/salon2.jpg" alt="Работа мастера по маникюру">
+        <img src="/images/salon3.jpg" alt="Работа барбера">
+    </section>
+</main>
+</body>
+</html>

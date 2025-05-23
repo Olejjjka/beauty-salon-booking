@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Beauty Salon</title>
+
+    <!-- Основные стили -->
+    <link rel="stylesheet" th:href="@{/css/styleDashboard.css}" href="/css/styleDashboard.css" />
+    <!-- Стили вкладок -->
+    <link rel="stylesheet" th:href="@{/css/styleTabs.css}" href="/css/styleTabs.css" />
+    <!-- Иконки FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <div class="header">
+            <div class="logo">Beauty Salon</div>
+            <div class="button-group">
+                <a th:href="@{/homepage}" class="home-btn">На главную</a>
+                <a th:href="@{/logout}" class="logout-btn">Выйти</a>
+            </div>
+        </div>
+
+        <h2>Личный кабинет</h2>
+
+        <!-- Блок с аватаром и именем пользователя -->
+        <div class="user-profile">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-name" th:text="${username}">пользователь</div>
+        </div>
+
+        <div th:if="${successCreateAppointment}" class="successMessage">
+            <p th:text="${successCreateAppointment}"></p>
+        </div>
+
+        <!-- Вкладки -->
+        <div class="tabs-container">
+            <input type="radio" name="tab" id="tab1" checked>
+            <input type="radio" name="tab" id="tab2">
+
+            <div class="tabs-header">
+                <label for="tab1" class="tab-label">О себе</label>
+                <label for="tab2" class="tab-label">Мои записи</label>
+            </div>
+
+            <div class="tab-contents">
+                <!-- Контент вкладки Редактирование -->
+                <div class="tab-content" id="content1">
+                    <h3>Информация</h3>
+                    <div class="record-field">
+                        <strong>Логин:</strong> <span th:text="${login}">Логин</span>
+                    </div>
+                    <div class="record-field">
+                        <strong>Телефон:</strong> <span th:text="${phone}">Телефон</span>
+                    </div>
+
+                    <h3>Редактировать профиль</h3>
+
+                    <div th:if="${errorUpdateProfile}" class="errorMessage">
+                        <p th:text="${errorUpdateProfile}"></p>
+                    </div>
+
+                    <form th:action="@{/dashboard/client/update-profile}" method="post" class="profile-form">
+                        <input type="hidden" name="clientId" th:value="${clientId}" />
+
+                        <div class="form-group">
+                            <label for="name">Имя:</label>
+                            <input type="text" id="name" name="name" placeholder="Новое имя" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Телефон:</label>
+                            <input type="text" id="phone" name="phone" placeholder="Новый телефон" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login">Логин:</label>
+                            <input type="text" id="login" name="login" placeholder="Новый логин" />
+                        </div>
+
+                        <button type="submit">Обновить профиль</button>
+                    </form>
+
+                    <h3>Сменить пароль</h3>
+
+                    <div th:if="${errorChangePassword}" class="errorMessage">
+                        <p th:text="${errorChangePassword}"></p>
+                    </div>
+
+                    <form th:action="@{/dashboard/client/change-password}" method="post">
+                        <input type="hidden" name="clientId" th:value="${clientId}" />
+
+                        <div class="form-group">
+                            <label for="oldPassword">Старый пароль:</label>
+                            <input type="password" id="oldPassword" name="oldPassword" placeholder="Текущий пароль" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newPassword">Новый пароль:</label>
+                            <input type="password" id="newPassword" name="newPassword" placeholder="Новый пароль" required />
+                        </div>
+
+                        <button type="submit">Сменить пароль</button>
+                    </form>
+                </div>
+
+                <!-- Контент вкладки Записи -->
+                <div class="tab-content" id="content2">
+                    <h3>Ваши записи</h3>
+                    <div class="records-grid">
+                        <div th:each="record : ${records}" class="record-card">
+                            <div class="record-field">
+                                <strong>Дата:</strong> <span th:text="${record.date}">дата</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Время:</strong> <span th:text="${record.time}">время</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Услуга:</strong> <span th:text="${record.beautyService.name}">услуга</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Мастер:</strong> <span th:text="${record.master.name}">мастер</span>
+                            </div>
+                            <div class="record-field">
+                                <strong>Статус:</strong> <span th:text="${record.status}">статус</span>
+                            </div>
+                        </div>
+
+                        <p th:if="${records.isEmpty()}" class="no-records">
+                            У вас пока нет записей. Хотите <a th:href="@{/appointment/select}" style="color: #a3cddc;">записаться</a>?
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Заглушка для дополнительного контента -->
+        <div class="content-placeholder">
+            Дополнительная информация будет здесь
+        </div>
+
+    </div>
+</body>
+</html>

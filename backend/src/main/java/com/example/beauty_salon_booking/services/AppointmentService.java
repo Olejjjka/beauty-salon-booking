@@ -199,10 +199,4 @@ public class AppointmentService {
                 .map(dtoConverter::convertToAppointmentDTO)
                 .toList();
     }
-
-    // не надо
-    @Transactional
-    public AppointmentDTO saveAppointment(Appointment appointment) {
-        return dtoConverter.convertToAppointmentDTO(appointmentRepository.save(appointment));
-    }
 }
